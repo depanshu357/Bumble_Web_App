@@ -1,6 +1,7 @@
 defmodule BumbleWebApp.Accounts.User do
   use Ecto.Schema
   import Ecto.Changeset
+  use Waffle.Ecto.Schema
 
   schema "users" do
     field :email, :string
@@ -109,6 +110,11 @@ defmodule BumbleWebApp.Accounts.User do
     user
     |> cast(attrs, [:description])
     |> validate_length(:description, max: 160)
+  end
+
+  def image_changeset(user, attrs) do
+    user
+    |> cast(attrs, [:photo_url])
   end
   @doc """
   A user changeset for changing the password.

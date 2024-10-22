@@ -32,6 +32,8 @@ defmodule BumbleWebApp.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
+      {:waffle, "~> 1.1"},
+      {:waffle_ecto, "~> 0.0.10"},
       {:bcrypt_elixir, "~> 3.0"},
       {:phoenix, "~> 1.7.14"},
       {:phoenix_ecto, "~> 4.5"},

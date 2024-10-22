@@ -8,7 +8,6 @@ defmodule BumbleWebApp.Accounts do
 
   alias BumbleWebApp.Accounts.{User, UserToken, UserNotifier}
 
-
   def update_user_profile(user, attrs) do
     user
     |> User.changeset(attrs)
@@ -124,6 +123,17 @@ defmodule BumbleWebApp.Accounts do
     |> User.description_changeset(attrs)
     |> Repo.update()
   end
+
+  def update_user_photo(user, attrs) do
+    user
+    |> User.image_changeset(attrs)
+    |> Repo.update()
+  end
+
+  def change_user_photo(user) do
+    User.image_changeset(user, %{})
+  end
+
   @doc """
   Emulates that the email will change without actually changing
   it in the database.
@@ -462,8 +472,8 @@ defmodule BumbleWebApp.Accounts do
   def change_profile(%Profile{} = profile, attrs \\ %{}) do
     Profile.changeset(profile, attrs)
   end
+
   def change_user(user) do
     User.changeset(user, %{})
   end
-
 end

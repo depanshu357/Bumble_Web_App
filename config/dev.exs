@@ -28,6 +28,9 @@ config :bumble_web_app, BumbleWebAppWeb.Endpoint,
     esbuild: {Esbuild, :install_and_run, [:bumble_web_app, ~w(--sourcemap=inline --watch)]},
     tailwind: {Tailwind, :install_and_run, [:bumble_web_app, ~w(--watch)]}
   ]
+  # live_view: [signing_salt: "your_salt"],
+  # static_url: [path: "/uploads"],
+  # static: [at: "/", from: :bumble_app, gzip: false]
 
 # ## SSL Support
 #

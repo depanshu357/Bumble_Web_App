@@ -11,12 +11,37 @@ defmodule BumbleWebAppWeb.UserSettingsLive do
     </.header>
 
     <div class="space-y-12 divide-y">
-    <div>
+      <div>
+        <h3>Profile Photo</h3>
+        <%= if @current_user.photo_url do %>
+          <img
+            src={@current_user.photo_url}
+            alt="Profile Photo"
+            class="h-24 w-24 rounded-full object-cover"
+          />
+        <% else %>
+          <p>No profile photo uploaded</p>
+        <% end %>
+      </div>
+
+      <div>
         <.simple_form
-          for={@description_form}
-          id="description_form"
-          phx-submit="update_description"
+          for={@photo_form}
+          id="photo_form"
+          phx-submit="update_photo"
+          phx-change="change_photo"
         >
+          <.live_file_input upload={@uploads.photo} />
+
+          <%!-- <.input field={@photo_form[:photo_url]} type="file" label="Upload Profile Photo" /> --%>
+          <:actions>
+            <.button phx-disable-with="Uploading...">Upload Photo</.button>
+          </:actions>
+        </.simple_form>
+      </div>
+
+      <div>
+        <.simple_form for={@description_form} id="description_form" phx-submit="update_description">
           <.input field={@description_form[:description]} type="text" label="Description" required />
           <:actions>
             <.button phx-disable-with="Changing...">Change Description</.button>
@@ -103,6 +128,7 @@ defmodule BumbleWebAppWeb.UserSettingsLive do
     email_changeset = Accounts.change_user_email(user)
     password_changeset = Accounts.change_user_password(user)
     description_changeset = Accounts.change_user_description(user)
+    photo_form = Accounts.change_user_photo(user)
 
     socket =
       socket
@@ -112,20 +138,73 @@ defmodule BumbleWebAppWeb.UserSettingsLive do
       |> assign(:email_form, to_form(email_changeset))
       |> assign(:password_form, to_form(password_changeset))
       |> assign(:description_form, to_form(description_changeset))
+      |> assign(:photo_form, to_form(photo_form))
+      |> allow_upload(:photo, accept: ~w(.jpg .jpeg .png), max_entries: 1)
       |> assign(:trigger_submit, false)
 
     {:ok, socket}
+  end
+
+  def handle_event("change_photo", _params, socket) do
+    {:noreply, socket}
+  end
+
+  def handle_event("update_photo", _params, socket) do
+    # Ensure the directory exists
+    uploads_dir = "priv/static/uploads/photos"
+    # Creates the directory if it doesn't exist
+    File.mkdir_p!(uploads_dir)
+
+    uploaded_files =
+      consume_uploaded_entries(socket, :photo, fn %{path: path}, _entry ->
+        extension = ".png"
+         # Ensure the destination path includes the appropriate extension
+        dest = Path.join("priv/static/uploads/photos", Path.basename(path) <> extension)
+
+        # Copy the file and return the path
+        File.cp!(path, dest)
+        # Return the relative path to be stored in photo_url
+        "/uploads/photos/#{Path.basename(path) <> extension}"
+      end)
+
+
+    # Get the image URL if the upload was successful
+    case uploaded_files do
+      [photo_url] ->
+        # Update the user with the new photo URL
+        case Accounts.update_user_photo(socket.assigns.current_user, %{"photo_url" => photo_url}) do
+          {:ok, _user} ->
+            {:noreply,
+             socket
+             |> put_flash(:info, "Profile photo updated successfully.")
+             |> assign(
+               photo_form: to_form(Accounts.change_user_photo(socket.assigns.current_user)),
+               current_user: %{socket.assigns.current_user | photo_url: photo_url}
+             )}
+
+          {:error, %Ecto.Changeset{} = changeset} ->
+            {:noreply,
+             socket
+             |> put_flash(:error, "Error updating profile photo.")
+             |> assign(photo_form: to_form(changeset))}
+        end
+
+      [] ->
+        {:noreply, socket |> put_flash(:error, "No file was uploaded.")}
+    end
   end
 
   def handle_event("update_description", %{"user" => user_params}, socket) do
     case Accounts.update_user_description(socket.assigns.current_user, user_params) do
       {:ok, _user} ->
         # Successful update, re-render the form with a new empty changeset
-        description_form = Accounts.change_user_description(socket.assigns.current_user) |> to_form()
+        description_form =
+          Accounts.change_user_description(socket.assigns.current_user) |> to_form()
 
         {:noreply,
          socket
-         |> put_flash(:info, "Description updated successfully.")  # Success message
+         # Success message
+         |> put_flash(:info, "Description updated successfully.")
          |> assign(description_form: description_form)}
 
       {:error, %Ecto.Changeset{} = changeset} ->
@@ -134,13 +213,11 @@ defmodule BumbleWebAppWeb.UserSettingsLive do
 
         {:noreply,
          socket
-         |> put_flash(:error, "Something went wrong. Please check the errors below.")  # Error message
+         # Error message
+         |> put_flash(:error, "Something went wrong. Please check the errors below.")
          |> assign(description_form: description_form)}
     end
   end
-
-
-
 
   def handle_event("validate_email", params, socket) do
     %{"current_password" => password, "user" => user_params} = params

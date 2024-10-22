@@ -1,4 +1,4 @@
-defmodule BumbleWebAppWeb.ProfileLive.Shows do
+defmodule BumbleWebAppWeb.ProfileLive.Show do
   use BumbleWebAppWeb, :live_view
 
   alias BumbleWebApp.Accounts
