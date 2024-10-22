@@ -8,6 +8,7 @@ defmodule BumbleWebAppWeb.ProfileLive.Shows do
     {:ok, socket}
   end
 
+  @impl Phoenix.LiveView
  def render(assigns) do
     ~H"""
     <div>
