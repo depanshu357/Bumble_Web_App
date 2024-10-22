@@ -23,7 +23,11 @@ defmodule BumbleWebApp.LikesAndMatches do
       nil -> {:ok, :no_match}
       _ ->
         # Create a match if both users liked each other
-        Repo.insert(%Match{user1_id: user_id, user2_id: liked_user_id})
+        %Match{}
+        |> Match.matches_changeset(%{user1_id: user_id, user2_id: liked_user_id})
+        |> Repo.insert()
+        {:ok, :match}
+        # Repo.insert(%Match{user1_id: user_id, user2_id: liked_user_id})
         {:ok, :match}
     end
   end
@@ -45,5 +49,19 @@ defmodule BumbleWebApp.LikesAndMatches do
     |> Repo.all()
   end
 
+  def list_matches(user_id) do
+    from(m in Match,
+    join: u in User,
+    on: u.id == m.user1_id or u.id == m.user2_id,
+    where: m.user1_id == ^user_id or m.user2_id == ^user_id,
+    where: u.id != ^user_id, # To avoid returning the current user's data
+    select: %{
+      id: u.id,
+      description: u.description,
+      photo_url: u.photo_url
+    }
+  )
+  |> Repo.all()
+  end
 
 end
