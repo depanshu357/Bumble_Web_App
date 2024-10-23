@@ -22,9 +22,14 @@ defmodule BumbleWebAppWeb.ProfileLive.Show do
       {:ok, _like} ->
         case LikesAndMatches.check_for_match(user.id, liked_user_id) do
           {:ok, :match} ->
-            send(self(), {:match, liked_user_id})
+            send(
+              self(),
+              {:match, liked_user_id,
+               put_flash(socket, :info, "You've matched with user #{liked_user_id}!")}
+            )
 
-          _ -> :ok
+          _ ->
+            :ok
         end
 
         # Reload profiles after a like
@@ -46,32 +51,43 @@ defmodule BumbleWebAppWeb.ProfileLive.Show do
   @impl true
   def render(assigns) do
     ~H"""
-    <div>
-      <h1>Profiles for liking</h1>
-      <%= for profile <- @profiles do %>
-        <div>
-          <img src={profile.photo_url} alt="Profile picture" />
-          <p><%= profile.description %></p>
-
-          <button phx-click="like" phx-value-liked_user_id={profile.id}
-           class="p-4 py-2 bg-black text-white rounded"
-          >Like</button>
-        </div>
-      <% end %>
-
-      <h2>Your Matches</h2>
-      <%= if @matches == [] do %>
-        <p>No matches yet!</p>
-      <% else %>
-        <%= for match <- @matches do %>
+    <div class="flex flex-row gap-2 w-screen">
+      <div class="w-[300px] h-[100px] bg-yellow-50 h-screen p-2">
+        <h2>Your Matches</h2>
+        <%= if @matches == [] do %>
+          <p>No matches yet!</p>
+        <% else %>
+          <%= for match <- @matches do %>
+            <div class="flex flex-row bg-yellow-100 p-2 gap-2">
+              <div class="rounded h-[60px]">
+                <img src={match.photo_url} alt="Match Profile Picture" class="rounded h-[60px]" />
+              </div>
+              <div>
+                <span> Matched with </span>
+                <%!-- <span><%= match.id %></span> --%>
+                <p><%= match.description %></p>
+              </div>
+            </div>
+          <% end %>
+        <% end %>
+      </div>
+      <div class="w-full max-w-[1000px] mx-auto">
+        <h1>Profiles for liking</h1>
+        <%= for profile <- @profiles do %>
           <div>
-            <span> Matched with: </span>
-            <span><%= match.id %></span>
-            <img src={match.photo_url} alt="Match Profile Picture" />
-            <p><%= match.description %></p>
+            <img src={profile.photo_url} alt="Profile picture" />
+            <p><%= profile.description %></p>
+
+            <button
+              phx-click="like"
+              phx-value-liked_user_id={profile.id}
+              class="p-4 py-2 bg-black text-white rounded"
+            >
+              Like
+            </button>
           </div>
         <% end %>
-      <% end %>
+      </div>
     </div>
     """
   end
