@@ -8,8 +8,10 @@ defmodule BumbleWebAppWeb.ProfileLive.Show do
   def mount(_params, _session, socket) do
     user = socket.assigns.current_user
     profiles = LikesAndMatches.list_of_profiles(user.id)
+    matches = LikesAndMatches.list_matches(user.id)
+    dbg(matches)
 
-    {:ok, assign(socket, profiles: profiles, user: user)}
+    {:ok, assign(socket, profiles: profiles, user: user, matches: matches)}
   end
 
   @impl true
@@ -27,7 +29,8 @@ defmodule BumbleWebAppWeb.ProfileLive.Show do
 
         # Reload profiles after a like
         profiles = LikesAndMatches.list_of_profiles(user.id)
-        {:noreply, assign(socket, profiles: profiles)}
+        matches = LikesAndMatches.list_matches(user.id)
+        {:noreply, assign(socket, profiles: profiles, matches: matches)}
 
       {:error, _reason} ->
         {:noreply, put_flash(socket, :error, "Error liking user.")}
@@ -54,6 +57,20 @@ defmodule BumbleWebAppWeb.ProfileLive.Show do
            class="p-4 py-2 bg-black text-white rounded"
           >Like</button>
         </div>
+      <% end %>
+
+      <h2>Your Matches</h2>
+      <%= if @matches == [] do %>
+        <p>No matches yet!</p>
+      <% else %>
+        <%= for match <- @matches do %>
+          <div>
+            <span> Matched with: </span>
+            <span><%= match.id %></span>
+            <img src={match.photo_url} alt="Match Profile Picture" />
+            <p><%= match.description %></p>
+          </div>
+        <% end %>
       <% end %>
     </div>
     """

@@ -11,8 +11,8 @@ defmodule BumbleWebApp.MixProject do
       aliases: aliases(),
       deps: deps()
     ]
-  end
-
+  end 
+ 
   # Configuration for the OTP application.
   #
   # Type `mix help compile.app` for more information.
