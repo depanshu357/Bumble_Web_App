@@ -52,6 +52,7 @@ defmodule BumbleWebAppWeb.ProfileLive.Show do
     ~H"""
     <div class="flex flex-row gap-2 w-screen">
       <div class="w-1/5 h-[100px] bg-yellow-50 h-screen p-2 border-r-2 border-grey-100">
+
         <h2>Your Matches</h2>
         <%= if @matches == [] do %>
           <p>No matches yet!</p>
