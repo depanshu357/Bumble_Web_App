@@ -64,7 +64,7 @@ defmodule BumbleWebAppWeb.ChatLive.Show do
   def render(assigns) do
     ~H"""
     <div class="flex flex-row w-screen">
-      <div class="w-1/5 h-[100px] bg-yellow-50 h-screen p-2 border-r-2 border-grey-100">
+      <div class="w-1/5 min-w-[300px] h-[100px] bg-yellow-50 h-screen p-2 border-r-2 border-grey-100">
         <h2>Your Matches</h2>
         <%= if @matches == [] do %>
           <p>No matches yet!</p>
@@ -84,9 +84,10 @@ defmodule BumbleWebAppWeb.ChatLive.Show do
           <% end %>
         <% end %>
       </div>
-      <div class="w-4/5 mx-auto relative h-[90vh] rounded  overflow-y-scroll">
+      <div class="w-4/5 mx-auto relative h-[90vh] rounded flex flex-col justify-between  overflow-y-scroll">
+
           <h1 class="font-bold text-lg text-center sticky top-1">Let's Gossip</h1>
-          <div class="">
+          <div class="h-full ">
             <%= for chat <- @chats do %>
               <div class={if chat.sender_id == @user.id, do: "message message-sent", else: "message message-received"}>
                 <span><%= chat.message %></span>
