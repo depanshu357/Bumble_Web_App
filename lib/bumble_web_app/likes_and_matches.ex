@@ -56,9 +56,10 @@ defmodule BumbleWebApp.LikesAndMatches do
     where: m.user1_id == ^user_id or m.user2_id == ^user_id,
     where: u.id != ^user_id, # To avoid returning the current user's data
     select: %{
-      id: u.id,
+      user_id: u.id,
       description: u.description,
-      photo_url: u.photo_url
+      photo_url: u.photo_url,
+      match_id: m.id
     }
   )
   |> Repo.all()

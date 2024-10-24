@@ -24,8 +24,7 @@ defmodule BumbleWebAppWeb.ProfileLive.Show do
           {:ok, :match} ->
             send(
               self(),
-              {:match, liked_user_id,
-               put_flash(socket, :info, "You've matched with user #{liked_user_id}!")}
+              {:match, liked_user_id}
             )
 
           _ ->
@@ -58,6 +57,7 @@ defmodule BumbleWebAppWeb.ProfileLive.Show do
           <p>No matches yet!</p>
         <% else %>
           <%= for match <- @matches do %>
+          <.link navigate={"/chat/#{match.match_id}"}>
             <div class="flex flex-row bg-yellow-100 p-2 gap-2">
               <div class="rounded h-[60px]">
                 <img src={match.photo_url} alt="Match Profile Picture" class="rounded h-[60px]" />
@@ -68,6 +68,7 @@ defmodule BumbleWebAppWeb.ProfileLive.Show do
                 <p><%= match.description %></p>
               </div>
             </div>
+          </.link>
           <% end %>
         <% end %>
       </div>
