@@ -3,3 +3,28 @@
 @import "tailwindcss/utilities";
 
 /* This file is for your main application CSS */
+.message {
+    display: flex;
+    margin: 12px 8px;
+}
+.message > span{
+    border-radius: 10px;
+}
+.message-sent {
+    justify-content: right;
+}
+.message-received {
+    justify-content: left;
+}
+.message-sent > span{
+    background-color: #cfcfcf;
+    font: bolder;
+    padding: 16px 8px;
+    border-bottom-right-radius: 2px;
+}
+.message-received > span{
+    background-color: #ffc629;
+    font: bolder;
+    padding: 16px 8px;
+    border-bottom-left-radius: 2px;
+}

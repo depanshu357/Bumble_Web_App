@@ -51,41 +51,55 @@ defmodule BumbleWebAppWeb.ProfileLive.Show do
   def render(assigns) do
     ~H"""
     <div class="flex flex-row gap-2 w-screen">
-      <div class="w-[300px] h-[100px] bg-yellow-50 h-screen p-2">
+      <div class="w-1/5 h-[100px] bg-yellow-50 h-screen p-2 border-r-2 border-grey-100">
         <h2>Your Matches</h2>
         <%= if @matches == [] do %>
           <p>No matches yet!</p>
         <% else %>
           <%= for match <- @matches do %>
-          <.link navigate={"/chat/#{match.match_id}"}>
-            <div class="flex flex-row bg-yellow-100 p-2 gap-2">
-              <div class="rounded h-[60px]">
-                <img src={match.photo_url} alt="Match Profile Picture" class="rounded h-[60px]" />
+            <.link navigate={"/chat/#{match.match_id}"}>
+              <div class="flex flex-row bg-yellow-100 p-2 gap-2">
+                <div class="rounded h-[60px]">
+                  <img src={match.photo_url} alt="Match Profile Picture" class="rounded h-[60px]" />
+                </div>
+                <div>
+                  <span> Matched with </span>
+                  <%!-- <span><%= match.id %></span> --%>
+                  <p><%= match.description %></p>
+                </div>
               </div>
-              <div>
-                <span> Matched with </span>
-                <%!-- <span><%= match.id %></span> --%>
-                <p><%= match.description %></p>
-              </div>
-            </div>
-          </.link>
+            </.link>
           <% end %>
         <% end %>
       </div>
-      <div class="w-full max-w-[1000px] mx-auto">
-        <h1>Profiles for liking</h1>
+      <div class="w-full max-w-[1000px] mx-auto m-auto">
+        <%!-- <h1>Profiles for liking</h1> --%>
         <%= for profile <- @profiles do %>
-          <div>
-            <img src={profile.photo_url} alt="Profile picture" />
-            <p><%= profile.description %></p>
+        <div class="relative max-w-[800px] h-[80vh]">
+          <div class="relative max-w-[800px] h-[80vh] border-2 border-yellow-400 rounded-lg flex flex-row overflow-hidden">
+            <div class="h-full w-3/5">
+              <img src={profile.photo_url} alt="Profile picture" class="h-full w-full" />
+            </div>
+            <div class="bg-yellow-100 w-2/5 flex items-center">
+              <p><%= profile.description %></p>
 
-            <button
-              phx-click="like"
-              phx-value-liked_user_id={profile.id}
-              class="p-4 py-2 bg-black text-white rounded"
-            >
-              Like
-            </button>
+
+            </div>
+          </div>
+          <%!-- <button
+                phx-click="like"
+                phx-value-liked_user_id={profile.id}
+                class="p-4 py-2 bg-yellow-500 text-white rounded-full absolute bottom-2 transform translate-x-1/2 left-1/2"
+              >
+                <img src="/images/check_icon.png" class="w-[40px]"/>
+              </button> --%>
+          <button
+                phx-click="like"
+                phx-value-liked_user_id={profile.id}
+                class="p-4 py-2 bg-yellow-500 text-white rounded-full absolute -bottom-6 transform translate-x-1/2 left-[60%]"
+              >
+                <img src="/images/check_icon.png" class="w-[40px]"/>
+              </button>
           </div>
         <% end %>
       </div>
