@@ -68,6 +68,7 @@ defmodule BumbleWebAppWeb.Router do
       on_mount: [{BumbleWebAppWeb.UserAuth, :ensure_authenticated}] do
       live "/users/settings", UserSettingsLive, :edit
       live "/profiles", ProfileLive.Show
+      live "/update_profile", UpdateProfileLive.Show
       live "/chat/:match_id", ChatLive.Show
       live "/users/settings/confirm_email/:token", UserSettingsLive, :confirm_email
     end
