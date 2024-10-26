@@ -59,7 +59,8 @@ defmodule BumbleWebApp.LikesAndMatches do
       user_id: u.id,
       description: u.description,
       photo_url: u.photo_url,
-      match_id: m.id
+      match_id: m.id,
+      name: u.name
     }
   )
   |> Repo.all()

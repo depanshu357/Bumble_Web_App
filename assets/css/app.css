@@ -43,5 +43,9 @@
 }
 
 .update-profile-buttons  button{
-    background-color: #f4d215 !important;
+    background-color: rgb(234, 179, 8) !important;
+}
+
+.chat_page_chat_box{
+    height: calc(100vh - 58px);
 }

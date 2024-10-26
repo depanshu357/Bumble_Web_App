@@ -64,30 +64,30 @@ defmodule BumbleWebAppWeb.ChatLive.Show do
   def render(assigns) do
     ~H"""
     <div class="flex flex-row w-screen">
-      <div class="w-1/5 min-w-[300px] h-[100px] bg-yellow-50 h-screen p-2 border-r-2 border-grey-100">
-        <h2>Your Matches</h2>
-        <%= if @matches == [] do %>
-          <p>No matches yet!</p>
-        <% else %>
-          <%= for match <- @matches do %>
-            <.link navigate={"/chat/#{match.match_id}"}>
-              <div class="flex flex-row bg-yellow-100 p-2 gap-2">
-                <div class="rounded h-[60px]">
-                  <img src={match.photo_url} alt="Match Profile Picture" class="rounded h-[60px]" />
-                </div>
-                <div>
-                  <%!-- <span><%= match.id %></span> --%>
-                  <p><%= match.description %></p>
-                </div>
+    <div class="w-1/5 h-[100px] bg-yellow-50 h-screen p-2 border-r-2 border-grey-100">
+      <%!-- <h2>Your Matches</h2> --%>
+      <%= if @matches == [] do %>
+        <p>No matches yet!</p>
+      <% else %>
+        <%= for match <- @matches do %>
+          <.link navigate={"/chat/#{match.match_id}"}>
+            <div class="flex flex-row bg-yellow-200 p-2 gap-2 mb-2 shadow-md max-h-[60px] overflow-hidden">
+              <div class="rounded h-[60px]">
+                <img src={match.photo_url} alt="Match Profile Picture" class="rounded-full h-[44px] w-[44px] object-cover" />
               </div>
-            </.link>
-          <% end %>
+              <div>
+                <p class="font-bold"><%= match.name %></p>
+                <p class="text-gray-500"><%= match.description %></p>
+              </div>
+            </div>
+          </.link>
         <% end %>
-      </div>
-      <div class="w-4/5 mx-auto relative h-[90vh] rounded flex flex-col justify-between  overflow-y-scroll">
+      <% end %>
+    </div>
+      <div class="w-4/5 chat_page_chat_box mx-auto relative rounded flex flex-col justify-between  overflow-y-hidden">
 
           <h1 class="font-bold text-lg text-center sticky top-1">Let's Gossip</h1>
-          <div class="h-full ">
+          <div class="h-full overflow-y-scroll">
             <%= for chat <- @chats do %>
               <div class={if chat.sender_id == @user.id, do: "message message-sent", else: "message message-received"}>
                 <span><%= chat.message %></span>

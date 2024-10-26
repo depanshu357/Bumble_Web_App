@@ -6,42 +6,46 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="csrf-token" content={get_csrf_token()} />
   <.live_title suffix=" · Phoenix Framework">
-    <%= assigns[:page_title] || "BumbleWebApp" %>
+    <%= assigns[:page_title] || "Bumble" %>
   </.live_title>
   <link phx-track-static rel="stylesheet" href={~p"/assets/app.css"} />
   <script defer phx-track-static type="text/javascript" src={~p"/assets/app.js"}>
+  <link rel="icon" type="image/x-icon" href="/images/bumble_icon.png" />
   </script>
 </head>
 
 <body class="bg-white">
   <div class="sticky z-10 flex items-center gap-4 px-4 sm:px-6 lg:px-8 justify-between bg-yellow-50 border-b-2 border-grey-100">
+    <%= if @current_user do%>
+    <div class="flex flex-row items-center gap-4">
+      <img src={@current_user.photo_url} class="h-[40px] w-[40px] rounded-full object-cover"/>
+        <%= @current_user.name %>
+    </div>
+    <% end %>
     <div>
       <a href="/">
-        <img src={~p"/images/bumble_logo.png"} height="10" width="100" />
+        <img src={~p"/images/bumble_logo.png"} width="100" class="object-cover"/>
       </a>
     </div>
 
     <div class="flex flex-row gap-4">
       <%= if @current_user do %>
-        <span class="text-[0.8125rem] leading-6 text-yellow-600">
-          <%= @current_user.email %>
-        </span>
         <span>
           <.link href={~p"/profiles"}
             class="text-[0.8125rem] leading-6 text-zinc-900 font-semibold hover:text-zinc-700">
-            Profiles
+            <img src="/images/find_people_icon.png" width="25" />
           </.link>
         </span>
         <span>
-          <.link href={~p"/users/settings"}
+          <.link href={~p"/update_profile"}
             class="text-[0.8125rem] leading-6 text-zinc-900 font-semibold hover:text-zinc-700">
-            Settings
+            <img src="/images/profile_icon.png" width="25" />
           </.link>
         </span>
         <span>
           <.link href={~p"/users/log_out"} method="delete"
             class="text-[0.8125rem] leading-6 text-zinc-900 font-semibold hover:text-zinc-700">
-            Log out
+            <img src="/images/logout_icon.png" width="25" />
           </.link>
         </span>
         <% else %>

@@ -74,19 +74,19 @@ def render(assigns) do
   ~H"""
   <div class="flex flex-row gap-2 w-screen">
     <div class="w-1/5 h-[100px] bg-yellow-50 h-screen p-2 border-r-2 border-grey-100">
-      <h2>Your Matches</h2>
+      <%!-- <h2>Your Matches</h2> --%>
       <%= if @matches == [] do %>
         <p>No matches yet!</p>
       <% else %>
         <%= for match <- @matches do %>
           <.link navigate={"/chat/#{match.match_id}"}>
-            <div class="flex flex-row bg-yellow-100 p-2 gap-2">
+            <div class="flex flex-row bg-yellow-200 p-2 gap-2 mb-2 shadow-md max-h-[60px] overflow-hidden">
               <div class="rounded h-[60px]">
-                <img src={match.photo_url} alt="Match Profile Picture" class="rounded h-[60px]" />
+                <img src={match.photo_url} alt="Match Profile Picture" class="rounded-full h-[44px] w-[44px] object-cover" />
               </div>
               <div>
-                <span>Matched with</span>
-                <p><%= match.description %></p>
+                <p class="font-bold"><%= match.name %></p>
+                <p class="text-gray-500"><%= match.description %></p>
               </div>
             </div>
           </.link>
@@ -94,17 +94,17 @@ def render(assigns) do
       <% end %>
     </div>
 
-    <div class="w-full max-w-[1000px] mx-auto m-auto">
+    <div class="w-full max-w-[1000px] mx-auto mt-12">
       <%= if length(@profiles) == 0 do %>
         <p class="font-bold m-auto text-xl text-center">No more profiles to show!</p>
       <% else %>
         <%!-- <%= profile = Enum.at(@profiles, @current_profile_index) %> --%>
-        <div class="relative max-w-[800px] h-[80vh]">
-          <div class="relative max-w-[800px] h-[80vh] border-2 border-yellow-400 rounded-lg flex flex-row overflow-hidden">
+        <div class="relative max-w-[1000px] h-[80vh] m-2">
+          <div class="relative max-w-[1000px] h-[80vh] border-2 border-yellow-400 rounded-lg flex flex-row overflow-hidden">
             <div class="h-full w-3/5">
-              <img src={@current_profile.photo_url} alt="Profile picture" class="h-full w-full" />
+              <img src={@current_profile.photo_url} alt="Profile picture" class="h-full w-full object-cover" />
             </div>
-            <div class="bg-yellow-100 w-2/5 flex items-center">
+            <div class="bg-yellow-100 w-2/5 flex items-center p-4">
               <p><%= @current_profile.description %></p>
             </div>
           </div>
