@@ -11,6 +11,7 @@ defmodule BumbleWebApp.Accounts.User do
     field :confirmed_at, :utc_datetime
     field :photo_url, :string
     field :description, :string
+    field :name, :string
 
     timestamps(type: :utc_datetime)
   end
@@ -106,6 +107,11 @@ defmodule BumbleWebApp.Accounts.User do
     end
   end
 
+  def name_changeset(user, attrs) do
+    user
+    |> cast(attrs, [:name])
+    |> validate_length(:name, max: 160)
+  end
   def description_changeset(user, attrs) do
     user
     |> cast(attrs, [:description])
@@ -174,7 +180,7 @@ defmodule BumbleWebApp.Accounts.User do
 
   def changeset(user, attrs) do
     user
-    |> cast(attrs, [:email, :photo_url, :description])
+    |> cast(attrs, [:email, :photo_url, :description, :name])
     |> validate_required([:email])
     |> validate_format(:email, ~r/@/)
     |> unique_constraint(:email)
