@@ -6,8 +6,8 @@ defmodule BumbleWebAppWeb.UpdateProfileLive.Show do
   def render(assigns) do
     ~H"""
     <.header class="text-center">
-      Account Settings
-      <:subtitle>Manage your account email address and password settings</:subtitle>
+      Update your charisma!
+      <%!-- <:subtitle>Manage your account email address and password settings</:subtitle> --%>
     </.header>
 
     <div class="update-profile-buttons max-w-[1000px] w-screen mx-auto p-4 flex flex-row gap-4 justify-between flex-wrap md:flex-nowrap">
@@ -18,7 +18,7 @@ defmodule BumbleWebAppWeb.UpdateProfileLive.Show do
             <img
               src={@current_user.photo_url}
               alt="Profile Photo"
-              class="h-[400px] w-full rounded-md object-cover"
+              class="h-[400px] w-full rounded-md object-cover shadow-lg"
             />
           <% else %>
             <div class="h-4 w-full">No profile photo uploaded</div>
@@ -60,10 +60,16 @@ defmodule BumbleWebAppWeb.UpdateProfileLive.Show do
             <.button phx-disable-with="Changing...">Update Name</.button>
           </:actions>
         </.simple_form>
+        <.simple_form for={@gender_form} id="gender_form" phx-submit="update_gender">
+          <.input field={@gender_form[:gender]} type="select" class="mt-0"  options={[{"male","Male"},{"female","Female"}]} />
+          <%!-- <:actions class="mt-0"> --%>
+            <.button phx-disable-with="Changing...">Select Gender</.button>
+          <%!-- </:actions> --%>
+        </.simple_form>
         <.simple_form for={@description_form} id="description_form" phx-submit="update_description">
           <.input field={@description_form[:description]} type="text" label="Description" required />
           <:actions>
-            <.button phx-disable-with="Changing...">Update Description</.button>
+            <.button phx-disable-with="Changing..." >Update Description</.button>
           </:actions>
         </.simple_form>
       </div>
@@ -91,6 +97,7 @@ defmodule BumbleWebAppWeb.UpdateProfileLive.Show do
     description_changeset = Accounts.change_user_description(user)
     name_changeset = Accounts.change_user_name(user)
     photo_form = Accounts.change_user_photo(user)
+    gender_form = Accounts.change_user_gender(user)
 
     socket =
       socket
@@ -102,6 +109,7 @@ defmodule BumbleWebAppWeb.UpdateProfileLive.Show do
       |> assign(:description_form, to_form(description_changeset))
       |> assign(:name_form, to_form(name_changeset))
       |> assign(:photo_form, to_form(photo_form))
+      |> assign(:gender_form, to_form(gender_form))
       |> allow_upload(:photo, accept: ~w(.jpg .jpeg .png), max_entries: 1)
       |> assign(:trigger_submit, false)
 
@@ -205,6 +213,38 @@ defmodule BumbleWebAppWeb.UpdateProfileLive.Show do
          |> assign(name_form: name_form)}
     end
   end
+
+  def handle_event("update_gender", %{"user" => user_params}, socket) do
+    case Accounts.update_user_gender(socket.assigns.current_user, user_params) do
+      {:ok, _user} ->
+        # Successful update, re-render the form with a new empty changeset
+        gender_form =
+          Accounts.change_user_gender(socket.assigns.current_user) |> to_form()
+
+        {:noreply,
+         socket
+         # Success message
+         |> put_flash(:info, "Gender updated successfully.")
+         |> assign(gender_form: gender_form)}
+
+      {:error, %Ecto.Changeset{} = changeset} ->
+        # On error, re-render the form with the errors in the changeset
+        gender_form = to_form(changeset)
+
+        {:noreply,
+         socket
+         # Error message
+         |> put_flash(:error, "Something went wrong. Please check the errors below.")
+         |> assign(gender_form: gender_form)}
+    end
+  end
+
+  def handle_event("validate_gender", %{"gender" => gender}, socket) do
+    # Assign the selected gender to the socket's assigns
+    gender_form = Map.put(socket.assigns.gender_form, :gender, gender)
+    {:noreply, assign(socket, gender_form: gender_form)}
+  end
+
 
 
 end

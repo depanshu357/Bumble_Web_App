@@ -12,6 +12,7 @@ defmodule BumbleWebApp.Accounts.User do
     field :photo_url, :string
     field :description, :string
     field :name, :string
+    field :gender, :string
 
     timestamps(type: :utc_datetime)
   end
@@ -105,6 +106,11 @@ defmodule BumbleWebApp.Accounts.User do
       %{changes: %{email: _}} = changeset -> changeset
       %{} = changeset -> add_error(changeset, :email, "did not change")
     end
+  end
+
+  def gender_changeset(user, attrs) do
+    user
+    |> cast(attrs, [:gender])
   end
 
   def name_changeset(user, attrs) do

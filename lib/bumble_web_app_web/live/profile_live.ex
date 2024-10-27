@@ -85,7 +85,7 @@ def render(assigns) do
                 <img src={match.photo_url} alt="Match Profile Picture" class="rounded-full h-[44px] w-[44px] object-cover" />
               </div>
               <div>
-                <p class="font-bold"><%= match.name %></p>
+                <span class="font-bold"><%= match.name %></span>
                 <p class="text-gray-500"><%= match.description %></p>
               </div>
             </div>
@@ -101,27 +101,30 @@ def render(assigns) do
         <%!-- <%= profile = Enum.at(@profiles, @current_profile_index) %> --%>
         <div class="relative max-w-[1000px] h-[80vh] m-2">
           <div class="relative max-w-[1000px] h-[80vh] border-2 border-yellow-400 rounded-lg flex flex-row overflow-hidden">
-            <div class="h-full w-3/5">
+            <div class="h-full w-3/5 relative">
               <img src={@current_profile.photo_url} alt="Profile picture" class="h-full w-full object-cover" />
-            </div>
-            <div class="bg-yellow-100 w-2/5 flex items-center p-4">
-              <p><%= @current_profile.description %></p>
-            </div>
-          </div>
-          <button
+              <button
             phx-click="next_profile"
             phx-value-liked_user_id={@current_profile.id}
-            class="p-4 py-2 bg-yellow-500 text-white rounded-full absolute -bottom-6 transform translate-x-1/2 left-[40%]"
+            class="p-4 bg-yellow-500 text-white rounded-full absolute bottom-4 transform left-[5%]"
           >
             <img src="/images/close_icon.png" class="w-[40px]" />
           </button>
           <button
             phx-click="like"
             phx-value-liked_user_id={@current_profile.id}
-            class="p-4 py-2 bg-yellow-500 text-white rounded-full absolute -bottom-6 transform translate-x-1/2 left-[60%]"
+            class="p-4 bg-yellow-500 text-white rounded-full absolute bottom-4 transform right-[5%]"
           >
             <img src="/images/check_icon.png" class="w-[40px]" />
           </button>
+            </div>
+            <div class="bg-yellow-100 w-2/5 flex flex-col  p-4">
+              <h2 class="font-bold text-2xl"><%= @current_profile.name %></h2>
+              <span class="text-gray-500"><%= @current_profile.gender %></span>
+              <p><%= @current_profile.description %></p>
+            </div>
+          </div>
+
         </div>
 
         <%!-- <div class="flex justify-between mt-4">

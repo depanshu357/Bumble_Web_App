@@ -49,3 +49,30 @@
 .chat_page_chat_box{
     height: calc(100vh - 58px);
 }
+
+#gender_form > div{
+    display: flex;
+    flex-direction: row;
+    height: 3rem;
+    align-items: center;
+    justify-content: space-between;
+}
+
+#name_form > div{
+    display: flex;
+    flex-direction: row;
+    height: 3rem;
+    align-items: center;
+    justify-content: space-between;
+}
+
+#description_form{
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    justify-content: space-between;
+}
+
+button{
+    margin: 0px !important;
+}
