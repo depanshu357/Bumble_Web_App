@@ -29,7 +29,7 @@ Please use a linux(ubuntu specifically) envivronment if possible
 1. **Clone the Repository**
 
    ```bash
-   git clone https://github.com/depanshu357/Bumble_Web_App.git master
+   git clone -b master https://github.com/depanshu357/Bumble_Web_App.git   
    cd bumble_web_app
    ```
 
