@@ -66,6 +66,12 @@
     justify-content: space-between;
 }
 
+#age_form > div{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
 #description_form{
     display: flex;
     flex-direction: column;

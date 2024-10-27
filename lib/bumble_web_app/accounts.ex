@@ -116,6 +116,16 @@ defmodule BumbleWebApp.Accounts do
     User.email_changeset(user, attrs, validate_email: false)
   end
 
+  def change_user_age(user, attrs \\ %{}) do
+    User.age_changeset(user, attrs)
+  end
+
+  def update_user_age(user, attrs) do
+    user
+    |> User.age_changeset(attrs)
+    |> Repo.update()
+  end
+
   def change_user_gender(user, attrs \\ %{}) do
     User.gender_changeset(user, attrs)
   end

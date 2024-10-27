@@ -22,7 +22,7 @@ Ensure you have the following installed on your machine:
 - **Phoenix** (version 1.6 or above)
 - **PostgreSQL** (for database management)
 
-Please use an linux(ubuntu specifically) envivronment if possible
+Please use a linux(ubuntu specifically) envivronment if possible
 
 ### Installation
 
@@ -39,8 +39,8 @@ Please use an linux(ubuntu specifically) envivronment if possible
    mix deps.get
    ```
 
-3. **Set up database**
-
+3. **Set up database**  
+   Make sure to change the credentials to connect to database in config/dev.exs file  
    ```bash
    mix ecto.setup
    ```
