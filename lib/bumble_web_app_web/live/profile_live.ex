@@ -25,24 +25,36 @@ defmodule BumbleWebAppWeb.ProfileLive.Show do
   def handle_event("like", %{"liked_user_id" => liked_user_id}, socket) do
     user = socket.assigns.user
 
+    is_match = false
     case LikesAndMatches.like_user(user.id, liked_user_id) do
       {:ok, _like} ->
-        case LikesAndMatches.check_for_match(user.id, liked_user_id) do
+        is_match = case LikesAndMatches.check_for_match(user.id, liked_user_id) do
           {:ok, :match} ->
-            send(
-              self(),
-              {:match, liked_user_id}
-            )
-
+            send(self(), {:match, liked_user_id})
+            put_flash(socket, :info, "It's a match! You and the user have liked each other.")
+            true  # Set is_match to true if there is a match
           _ ->
-            :ok
+            false  # Remains false if no match
         end
 
         # Reload profiles after a like
         profiles = LikesAndMatches.list_of_profiles(user.id)
         matches = LikesAndMatches.list_matches(user.id)
         current_profile = Enum.at(profiles, 0)
-        {:noreply, assign(socket, profiles: profiles, matches: matches, current_profile: current_profile, current_profile_index: 0)}
+        if is_match do
+          {:noreply,
+            socket
+            |> assign(profiles: profiles, matches: matches, current_profile: current_profile, current_profile_index: 0)
+            |> put_flash(:info, "You have a match!")
+          }
+        else
+          {:noreply, put_flash(socket, :info, "You've liked user #{liked_user_id}.")}
+        end
+        # {:noreply,
+        #   socket
+        #   |> assign(profiles: profiles, matches: matches, current_profile: current_profile, current_profile_index: 0)
+        # }
+        # {:noreply, assign(socket, profiles: profiles, matches: matches, current_profile: current_profile, current_profile_index: 0)}
 
       {:error, _reason} ->
         {:noreply, put_flash(socket, :error, "Error liking user.")}
@@ -122,6 +134,14 @@ def render(assigns) do
               <h2 class="font-bold text-2xl"><%= @current_profile.name %></h2>
               <span class="text-gray-500"><%= @current_profile.gender %></span>
               <p><%= @current_profile.description %></p>
+              <div>
+                <span class="font-bold">Interests:</span>
+                <ul>
+                  <%= for interest <- @current_profile.interests do %>
+                    <li><%= interest %></li>
+                  <% end %>
+                </ul>
+              </div>
             </div>
           </div>
 
