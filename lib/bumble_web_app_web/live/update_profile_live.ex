@@ -207,23 +207,23 @@ defmodule BumbleWebAppWeb.UpdateProfileLive.Show do
   def handle_event("update_description", %{"user" => user_params}, socket) do
     case Accounts.update_user_description(socket.assigns.current_user, user_params) do
       {:ok, _user} ->
-        # Successful update, re-render the form with a new empty changeset
+
         description_form =
           Accounts.change_user_description(socket.assigns.current_user) |> to_form()
 
         {:noreply,
          socket
-         # Success message
+
          |> put_flash(:info, "Description updated successfully.")
          |> assign(description_form: description_form)}
 
       {:error, %Ecto.Changeset{} = changeset} ->
-        # On error, re-render the form with the errors in the changeset
+
         description_form = to_form(changeset)
 
         {:noreply,
          socket
-         # Error message
+
          |> put_flash(:error, "Something went wrong. Please check the errors below.")
          |> assign(description_form: description_form)}
     end
@@ -232,23 +232,23 @@ defmodule BumbleWebAppWeb.UpdateProfileLive.Show do
   def handle_event("update_name", %{"user" => user_params}, socket) do
     case Accounts.update_user_name(socket.assigns.current_user, user_params) do
       {:ok, _user} ->
-        # Successful update, re-render the form with a new empty changeset
+
         name_form =
           Accounts.change_user_name(socket.assigns.current_user) |> to_form()
 
         {:noreply,
          socket
-         # Success message
+
          |> put_flash(:info, "Name updated successfully.")
          |> assign(name_form: name_form)}
 
       {:error, %Ecto.Changeset{} = changeset} ->
-        # On error, re-render the form with the errors in the changeset
+
         name_form = to_form(changeset)
 
         {:noreply,
          socket
-         # Error message
+
          |> put_flash(:error, "Something went wrong. Please check the errors below.")
          |> assign(name_form: name_form)}
     end
@@ -257,23 +257,23 @@ defmodule BumbleWebAppWeb.UpdateProfileLive.Show do
   def handle_event("update_gender", %{"user" => user_params}, socket) do
     case Accounts.update_user_gender(socket.assigns.current_user, user_params) do
       {:ok, _user} ->
-        # Successful update, re-render the form with a new empty changeset
+
         gender_form =
           Accounts.change_user_gender(socket.assigns.current_user) |> to_form()
 
         {:noreply,
          socket
-         # Success message
+
          |> put_flash(:info, "Gender updated successfully.")
          |> assign(gender_form: gender_form)}
 
       {:error, %Ecto.Changeset{} = changeset} ->
-        # On error, re-render the form with the errors in the changeset
+
         gender_form = to_form(changeset)
 
         {:noreply,
          socket
-         # Error message
+
          |> put_flash(:error, "Something went wrong. Please check the errors below.")
          |> assign(gender_form: gender_form)}
     end
@@ -288,23 +288,23 @@ defmodule BumbleWebAppWeb.UpdateProfileLive.Show do
   def handle_event("update_age", %{"user" => user_params}, socket) do
     case Accounts.update_user_age(socket.assigns.current_user, user_params) do
       {:ok, _user} ->
-        # Successful update, re-render the form with a new empty changeset
+
         age_form =
           Accounts.change_user_age(socket.assigns.current_user) |> to_form()
 
         {:noreply,
          socket
-         # Success message
+
          |> put_flash(:info, "Age updated successfully.")
          |> assign(age_form: age_form)}
 
       {:error, %Ecto.Changeset{} = changeset} ->
-        # On error, re-render the form with the errors in the changeset
+
         age_form = to_form(changeset)
 
         {:noreply,
          socket
-         # Error message
+
          |> put_flash(:error, "Something went wrong. Please check the errors below.")
          |> assign(age_form: age_form)}
     end

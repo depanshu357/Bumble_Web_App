@@ -63,6 +63,7 @@ defmodule BumbleWebApp.LikesAndMatches do
       name: u.name,
       gender: u.gender,
       interests: u.interests,
+      age: u.age,
     }
   )
   |> Repo.all()

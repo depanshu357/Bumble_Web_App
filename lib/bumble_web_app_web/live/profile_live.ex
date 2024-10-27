@@ -7,7 +7,8 @@ defmodule BumbleWebAppWeb.ProfileLive.Show do
   @impl true
   def mount(_params, _session, socket) do
     user = socket.assigns.current_user
-    profiles = LikesAndMatches.list_of_profiles(user.id)
+    # profiles = LikesAndMatches.list_of_profiles(user.id)
+    profiles = sort_profiles(LikesAndMatches.list_of_profiles(user.id), user)
     matches = LikesAndMatches.list_matches(user.id)
     current_profile = Enum.at(profiles, 0)
     dbg(matches)
@@ -48,7 +49,7 @@ defmodule BumbleWebAppWeb.ProfileLive.Show do
             |> put_flash(:info, "You have a match!")
           }
         else
-          {:noreply, put_flash(socket, :info, "You've liked user #{liked_user_id}.")}
+          {:noreply, assign(socket, profiles: profiles, matches: matches, current_profile: current_profile, current_profile_index: 0)}
         end
         # {:noreply,
         #   socket
@@ -61,7 +62,24 @@ defmodule BumbleWebAppWeb.ProfileLive.Show do
     end
   end
 
-  @impl true
+  def sort_profiles(profiles, current_user) do
+    Enum.sort_by(profiles, fn profile ->
+      age_difference =
+        if profile.age && current_user.age do
+          abs(current_user.age - profile.age)
+        else
+          1000
+        end
+      mutual_interests_count = count_mutual_interests(current_user.interests, profile.interests)
+
+      {age_difference, -mutual_interests_count}
+    end)
+  end
+
+  defp count_mutual_interests(interests1, interests2) do
+    Enum.count(interests1, fn interest -> interest in interests2 end)
+  end
+
   def handle_event("next_profile", _params, socket) do
     new_index = min(socket.assigns.current_profile_index + 1, length(socket.assigns.profiles) - 1)
     current_profile = Enum.at(socket.assigns.profiles, new_index)

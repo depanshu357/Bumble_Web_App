@@ -1,5 +1,5 @@
 {application,bumble_web_app,
-    [{config_mtime,1729982957},
+    [{config_mtime,1730039840},
      {compile_env,
          [{bumble_web_app,['Elixir.BumbleWebAppWeb.Gettext'],error},
           {bumble_web_app,[dev_routes],error},
