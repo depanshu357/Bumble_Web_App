@@ -126,6 +126,15 @@ defmodule BumbleWebApp.Accounts do
     |> Repo.update()
   end
 
+  def change_user_interests(user, attrs \\ %{}) do
+    User.interests_changeset(user, attrs)
+  end
+  def update_user_interests(user, attrs) do
+    user
+    |> User.interests_changeset(attrs)
+    |> Repo.update()
+  end
+
   def change_user_gender(user, attrs \\ %{}) do
     User.gender_changeset(user, attrs)
   end

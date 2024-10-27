@@ -3,6 +3,8 @@ defmodule BumbleWebAppWeb.UpdateProfileLive.Show do
 
   alias BumbleWebApp.Accounts
 
+
+  @impl true
   def render(assigns) do
     ~H"""
     <.header class="text-center">
@@ -72,7 +74,7 @@ defmodule BumbleWebAppWeb.UpdateProfileLive.Show do
           <%!-- </:actions> --%>
         </.simple_form>
         <.simple_form for={@age_form} id="age_form" phx-submit="update_age">
-          <.input field={@age_form[:age]} type="number" label="Age" required/>
+          <.input field={@age_form[:age]} type="number" label="Age" required />
           <:actions>
             <.button phx-disable-with="Changing...">Select Age</.button>
           </:actions>
@@ -85,9 +87,30 @@ defmodule BumbleWebAppWeb.UpdateProfileLive.Show do
         </.simple_form>
       </div>
     </div>
+    <div class="max-w-[1000px] w-screen mt-2 mx-auto p-4">
+      <h2 class="text-center font-bold">Select your interests</h2>
+      <p class="text-center text-sm text-gray-500 mb-2">It will help in finding better people</p>
+      <form phx-submit="update_interests" class="interests-list flex flex-row justify-between flex-wrap w-full gap-2" phx-submit="update_interests">
+        <%= for interest <- @predefined_interests do %>
+          <span
+            phx-click="toggle_interest"
+            phx-value-interest={interest}
+            class={"hover:bg-gray-300 p-2 rounded-md border border-gray-300 cursor-pointer" <> if interest in @interests, do: " bg-yellow-500 text-white hover:bg-yellow-500", else: ""}
+          >
+            <%= interest %>
+          </span>
+        <% end %>
+        <div class="w-full flex flex-row-reverse">
+        <button type="submit"  phx-disable-with="Updating..." class="m-2 p-2 rounded-md text-white font-bold bg-yellow-500">
+          Update Interests
+        </button>
+        </div>
+      </form>
+    </div>
     """
   end
 
+  @impl true
   def mount(%{"token" => token}, _session, socket) do
     socket =
       case Accounts.update_user_email(socket.assigns.current_user, token) do
@@ -110,7 +133,10 @@ defmodule BumbleWebAppWeb.UpdateProfileLive.Show do
     photo_form = Accounts.change_user_photo(user)
     gender_form = Accounts.change_user_gender(user)
     age_form = Accounts.change_user_age(user)
+    interests = user.interests || []
+    predefined_interests = ["📖 Reading", "🧳 Travelling", "⚽ Sports", "🎶 Music", "🍿 Movies", "🥘 Cooking", "🎨 Art", "📷 Photography", "🕹️ Gaming", "🌍 Environmental Activism", "🏕️ Camping", "🖥️ Tech & Coding", "✈️ Adventure", "🍽️ Food Tasting", "🚴 Biking", "🏋️ Fitness", "🌌 Stargazing", "✍️ Writing", "🎭 Theater", "🧘 Mindfulness", "🎤 Karaoke", "🐾 Animal Welfare", "📚 Self-Improvement", "🎲 Board Games","🌱 Gardening","🛶 Kayaking", "🚗 Road Trips", "🌄 Hiking", "🏄 Water Sports", "🏌️ Golf", "🧩 Puzzles", "🎳 Bowling", "🧵 Crafts & DIY", "🏛️ History", "🛍️ Fashion", "🏖️ Beach Days", "📜 Cultural Events", "🎉 Party Planning", "🎣 Fishing", "🚤 Boating", "🥂 Wine Tasting", "🎧 Podcasts", "🧗 Rock Climbing", "🛹 Skateboarding", "🖋️ Calligraphy", "🧙 Fantasy & Sci-Fi", "🎥 Filmmaking", "🎩 Magic Tricks", "🔬 Science Experiments"]
 
+    IO.inspect(interests)
     socket =
       socket
       |> assign(:current_password, nil)
@@ -123,9 +149,10 @@ defmodule BumbleWebAppWeb.UpdateProfileLive.Show do
       |> assign(:photo_form, to_form(photo_form))
       |> assign(:gender_form, to_form(gender_form))
       |> assign(:age_form, to_form(age_form))
+      |> assign(:interests, interests)
+      |> assign(:predefined_interests, predefined_interests)
       |> allow_upload(:photo, accept: ~w(.jpg .jpeg .png), max_entries: 1)
       |> assign(:trigger_submit, false)
-
     {:ok, socket}
   end
 
@@ -282,4 +309,34 @@ defmodule BumbleWebAppWeb.UpdateProfileLive.Show do
          |> assign(age_form: age_form)}
     end
   end
+
+  @impl true
+  def handle_event("toggle_interest", %{"interest" => interest}, socket) do
+    interests = socket.assigns.interests
+
+    # Toggle the interest in the list
+    updated_interests =
+      if interest in interests do
+        interests -- [interest]  # Remove if already selected
+      else
+        [interest | interests]   # Add if not yet selected
+      end
+
+    {:noreply, assign(socket, :interests, updated_interests)}
+  end
+
+  def handle_event("update_interests", _params, socket) do
+    current_user = socket.assigns.current_user
+    interests = socket.assigns.interests
+
+    # Update the user interests
+    case Accounts.update_user_interests(current_user, %{"interests" => interests}) do
+      {:ok, _user} ->
+        {:noreply, put_flash(socket, :info, "Interests updated successfully.")}
+
+      {:error, %Ecto.Changeset{} = _changeset} ->
+        {:noreply, put_flash(socket, :error, "Failed to update interests.")}
+    end
+  end
+
 end

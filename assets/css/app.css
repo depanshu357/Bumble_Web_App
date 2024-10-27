@@ -82,3 +82,11 @@
 button{
     margin: 0px !important;
 }
+
+.interests-list{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 2px;
+}

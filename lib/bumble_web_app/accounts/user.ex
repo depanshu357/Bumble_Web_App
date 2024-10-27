@@ -14,6 +14,7 @@ defmodule BumbleWebApp.Accounts.User do
     field :name, :string
     field :gender, :string
     field :age, :integer
+    field :interests, {:array, :string}
 
     timestamps(type: :utc_datetime)
   end
@@ -107,6 +108,11 @@ defmodule BumbleWebApp.Accounts.User do
       %{changes: %{email: _}} = changeset -> changeset
       %{} = changeset -> add_error(changeset, :email, "did not change")
     end
+  end
+
+  def interests_changeset(user, attrs) do
+    user
+    |> cast(attrs, [:interests])
   end
 
   def age_changeset(user, attrs) do
