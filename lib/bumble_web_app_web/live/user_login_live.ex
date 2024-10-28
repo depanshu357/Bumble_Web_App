@@ -3,7 +3,7 @@ defmodule BumbleWebAppWeb.UserLoginLive do
 
   def render(assigns) do
     ~H"""
-    <div class="max-w-[1000px] w-screen h-[50vh] mx-auto mt-12 rounded-md overflow-hidden flex flex-row shadow-lg">
+    <div class="max-w-[1000px] w-screen h-[50vh] mx-auto mt-[20vh] rounded-md overflow-hidden flex flex-row shadow-lg">
       <div class="w-1/2 bg-yellow-300">
         <img src="/images/bumble_wide.png" alt="Login" class="object-cover w-full h-full" />
       </div>

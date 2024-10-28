@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: asdfasdf
+      POSTGRES_DB: bumble_web_app_dev
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  bumble_web_app:
+    build: .
+    ports:
+      - "4000:4000"
+    environment:
+      DATABASE_URL: postgres://postgres:asdfasdf@postgres/bumble_web_app_dev
+      SECRET_KEY_BASE: CpSfvSSdqvy+6HJpoSHgjwXhZFLzdyhgSm5HyV4jeBD/AhlSibj0n4eQxLF79wJ3
+      PORT: 4000
+    depends_on:
+      - postgres
+
+volumes:
+  pgdata:

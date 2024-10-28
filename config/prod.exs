@@ -6,7 +6,10 @@ import Config
 # which you should run after static files are built and
 # before starting your production server.
 config :bumble_web_app, BumbleWebAppWeb.Endpoint,
-  cache_static_manifest: "priv/static/cache_manifest.json"
+  cache_static_manifest: "priv/static/cache_manifest.json",
+  http: [port: System.get_env("PORT") || 4000],
+  server: true,
+  check_origin: ["http://localhost:4000"]
 
 # Configures Swoosh API Client
 config :swoosh, api_client: Swoosh.ApiClient.Finch, finch_name: BumbleWebApp.Finch
@@ -16,6 +19,12 @@ config :swoosh, local: false
 
 # Do not print debug messages in production
 config :logger, level: :info
+
+config :bumble_web_app, MyApp.Repo,
+  url: System.get_env("DATABASE_URL"),
+  pool_size: 10
+
+config :bumble_web_app, ecto_repos: [BumbleWebApp.Repo]
 
 # Runtime production configuration, including reading
 # of environment variables, is done on config/runtime.exs.

@@ -172,6 +172,13 @@ defmodule BumbleWebApp.Accounts do
     User.image_changeset(user, %{})
   end
 
+  def update_user_location(user_id, location_data) do
+    User
+    |> Repo.get!(user_id)
+    |> User.location_changeset(location_data)
+    |> Repo.update()
+  end
+
   @doc """
   Emulates that the email will change without actually changing
   it in the database.

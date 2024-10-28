@@ -11,6 +11,7 @@ defmodule BumbleWebAppWeb.UpdateProfileLive.Show do
       Update your charisma!
       <%!-- <:subtitle>Manage your account email address and password settings</:subtitle> --%>
     </.header>
+    <div id="location" phx-hook="LocationRequest"></div>
 
     <div class="update-profile-buttons max-w-[1000px] w-screen mx-auto p-4 flex flex-row gap-4 justify-between flex-wrap md:flex-nowrap">
       <div class="w-full md:w-1/2">
@@ -156,6 +157,11 @@ defmodule BumbleWebAppWeb.UpdateProfileLive.Show do
     {:ok, socket}
   end
 
+  def handle_event("location_update", %{"latitude" => lat, "longitude" => lng}, socket) do
+    Accounts.update_user_location(socket.assigns.current_user.id, %{latitude: lat, longitude: lng})
+    {:noreply, socket}
+  end
+
   def handle_event("change_photo", _params, socket) do
     {:noreply, socket}
   end
@@ -169,13 +175,14 @@ defmodule BumbleWebAppWeb.UpdateProfileLive.Show do
     uploaded_files =
       consume_uploaded_entries(socket, :photo, fn %{path: path}, _entry ->
         extension = ".png"
-        # Ensure the destination path includes the appropriate extension
-        dest = Path.join("priv/static/uploads/photos", Path.basename(path) <> extension)
+        unique_id = UUID.uuid4()
+        path_name_inside_folder = unique_id <> "_" <> Path.basename(path) <> extension
+        dest = Path.join("priv/static/uploads/photos", path_name_inside_folder)
 
         # Copy the file and return the path
         File.cp!(path, dest)
         # Return the relative path to be stored in photo_url
-        "/uploads/photos/#{Path.basename(path) <> extension}"
+        "/uploads/photos/#{path_name_inside_folder}"
       end)
 
     # Get the image URL if the upload was successful

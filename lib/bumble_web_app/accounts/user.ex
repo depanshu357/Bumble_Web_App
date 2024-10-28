@@ -15,6 +15,8 @@ defmodule BumbleWebApp.Accounts.User do
     field :gender, :string
     field :age, :integer
     field :interests, {:array, :string}
+    field :latitude, :float
+    field :longitude, :float
 
     timestamps(type: :utc_datetime)
   end
@@ -136,9 +138,29 @@ defmodule BumbleWebApp.Accounts.User do
     |> validate_length(:description, max: 160)
   end
 
+  @spec image_changeset(
+          {map(),
+           %{
+             optional(atom()) =>
+               atom()
+               | {:array | :assoc | :embed | :in | :map | :parameterized | :supertype | :try,
+                  any()}
+           }}
+          | %{
+              :__struct__ => atom() | %{:__changeset__ => any(), optional(any()) => any()},
+              optional(atom()) => any()
+            },
+          :invalid | %{optional(:__struct__) => none(), optional(atom() | binary()) => any()}
+        ) :: Ecto.Changeset.t()
   def image_changeset(user, attrs) do
     user
     |> cast(attrs, [:photo_url])
+  end
+
+  def location_changeset(user, attrs) do
+    user
+    |> cast(attrs, [:latitude, :longitude])
+    |> validate_required([:latitude, :longitude])
   end
   @doc """
   A user changeset for changing the password.

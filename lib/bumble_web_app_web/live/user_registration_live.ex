@@ -6,7 +6,7 @@ defmodule BumbleWebAppWeb.UserRegistrationLive do
 
   def render(assigns) do
     ~H"""
-    <div class="max-w-[1000px] w-screen h-[50vh] mx-auto mt-12 rounded-md overflow-hidden flex flex-row shadow-lg">
+    <div class="max-w-[1000px] w-screen h-[50vh] mx-auto mt-[20vh] rounded-md overflow-hidden flex flex-row shadow-lg">
       <div class="w-1/2 bg-yellow-300">
         <img src="/images/bumble_wide.png" alt="Login" class="object-cover w-full h-full" />
       </div>
@@ -15,7 +15,7 @@ defmodule BumbleWebAppWeb.UserRegistrationLive do
           Register for an account
           <:subtitle>
             Already registered?
-            <.link navigate={~p"/users/log_in"} class="font-semibold text-brand hover:underline">
+            <.link navigate={~p"/users/log_in"} class="font-semibold text-yellow-500 hover:underline">
               Log in
             </.link>
             to your account now.

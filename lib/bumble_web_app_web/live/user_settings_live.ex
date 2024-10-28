@@ -158,13 +158,14 @@ defmodule BumbleWebAppWeb.UserSettingsLive do
     uploaded_files =
       consume_uploaded_entries(socket, :photo, fn %{path: path}, _entry ->
         extension = ".png"
-         # Ensure the destination path includes the appropriate extension
-        dest = Path.join("priv/static/uploads/photos", Path.basename(path) <> extension)
+        random_id = Base.encode16(:crypto.strong_rand_bytes(8))
+        path_name_inside_folder = random_id <> "_" <> Path.basename(path) <> extension
+        dest = Path.join("priv/static/uploads/photos", path_name_inside_folder)
 
         # Copy the file and return the path
         File.cp!(path, dest)
         # Return the relative path to be stored in photo_url
-        "/uploads/photos/#{Path.basename(path) <> extension}"
+        "/uploads/photos/#{path_name_inside_folder}"
       end)
 
 

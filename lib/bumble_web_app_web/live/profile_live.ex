@@ -19,7 +19,8 @@ defmodule BumbleWebAppWeb.ProfileLive.Show do
        user: user,
        matches: matches,
        current_profile: current_profile,
-       current_profile_index: 0)}
+       current_profile_index: 0
+     )}
   end
 
   @impl true
@@ -27,35 +28,52 @@ defmodule BumbleWebAppWeb.ProfileLive.Show do
     user = socket.assigns.user
 
     is_match = false
+
     case LikesAndMatches.like_user(user.id, liked_user_id) do
       {:ok, _like} ->
-        is_match = case LikesAndMatches.check_for_match(user.id, liked_user_id) do
-          {:ok, :match} ->
-            send(self(), {:match, liked_user_id})
-            put_flash(socket, :info, "It's a match! You and the user have liked each other.")
-            true  # Set is_match to true if there is a match
-          _ ->
-            false  # Remains false if no match
-        end
+        is_match =
+          case LikesAndMatches.check_for_match(user.id, liked_user_id) do
+            {:ok, :match} ->
+              send(self(), {:match, liked_user_id})
+              put_flash(socket, :info, "It's a match! You and the user have liked each other.")
+              # Set is_match to true if there is a match
+              true
+
+            _ ->
+              # Remains false if no match
+              false
+          end
 
         # Reload profiles after a like
         profiles = LikesAndMatches.list_of_profiles(user.id)
         matches = LikesAndMatches.list_matches(user.id)
         current_profile = Enum.at(profiles, 0)
+
         if is_match do
           {:noreply,
-            socket
-            |> assign(profiles: profiles, matches: matches, current_profile: current_profile, current_profile_index: 0)
-            |> put_flash(:info, "You have a match!")
-          }
+           socket
+           |> assign(
+             profiles: profiles,
+             matches: matches,
+             current_profile: current_profile,
+             current_profile_index: 0
+           )
+           |> put_flash(:info, "You have a match!")}
         else
-          {:noreply, assign(socket, profiles: profiles, matches: matches, current_profile: current_profile, current_profile_index: 0)}
+          {:noreply,
+           assign(socket,
+             profiles: profiles,
+             matches: matches,
+             current_profile: current_profile,
+             current_profile_index: 0
+           )}
         end
-        # {:noreply,
-        #   socket
-        #   |> assign(profiles: profiles, matches: matches, current_profile: current_profile, current_profile_index: 0)
-        # }
-        # {:noreply, assign(socket, profiles: profiles, matches: matches, current_profile: current_profile, current_profile_index: 0)}
+
+      # {:noreply,
+      #   socket
+      #   |> assign(profiles: profiles, matches: matches, current_profile: current_profile, current_profile_index: 0)
+      # }
+      # {:noreply, assign(socket, profiles: profiles, matches: matches, current_profile: current_profile, current_profile_index: 0)}
 
       {:error, _reason} ->
         {:noreply, put_flash(socket, :error, "Error liking user.")}
@@ -70,6 +88,7 @@ defmodule BumbleWebAppWeb.ProfileLive.Show do
         else
           1000
         end
+
       mutual_interests_count = count_mutual_interests(current_user.interests, profile.interests)
 
       {age_difference, -mutual_interests_count}
@@ -100,90 +119,99 @@ defmodule BumbleWebAppWeb.ProfileLive.Show do
   end
 
   @impl true
-def render(assigns) do
-  ~H"""
-  <div class="flex flex-row gap-2 w-screen">
-    <div class="w-1/5 h-[100px] bg-yellow-50 h-screen p-2 border-r-2 border-grey-100">
-      <%!-- <h2>Your Matches</h2> --%>
-      <%= if @matches == [] do %>
-        <p>No matches yet!</p>
-      <% else %>
-        <%= for match <- @matches do %>
-          <.link navigate={"/chat/#{match.match_id}"}>
-            <div class="flex flex-row bg-yellow-200 p-2 gap-2 mb-2 shadow-md max-h-[60px] overflow-hidden">
-              <div class="rounded h-[60px]">
-                <img src={match.photo_url} alt="Match Profile Picture" class="rounded-full h-[44px] w-[44px] object-cover" />
+  def render(assigns) do
+    ~H"""
+    <div class="flex flex-row gap-2 w-screen">
+      <div class="w-1/5 min-w-[300px] h-[100px] bg-yellow-50 h-screen p-2 border-r-2 border-grey-100">
+        <%!-- <h2>Your Matches</h2> --%>
+        <%= if @matches == [] do %>
+          <p>No matches yet!</p>
+        <% else %>
+          <%= for match <- @matches do %>
+            <.link navigate={"/chat/#{match.match_id}"}>
+              <div class="flex flex-row bg-yellow-200 p-2 gap-2 mb-2 shadow-md max-h-[60px] overflow-hidden">
+                <div class="rounded h-[60px] w-[50px]">
+                  <img
+                    src={match.photo_url}
+                    alt="Match Profile Picture"
+                    class="rounded-full h-[44px] w-[44px] object-cover object-center"
+                  />
+                </div>
+                <div>
+                  <span class="font-bold"><%= match.name %></span>
+                  <p class="text-gray-500"><%= match.description %></p>
+                </div>
               </div>
-              <div>
-                <span class="font-bold"><%= match.name %></span>
-                <p class="text-gray-500"><%= match.description %></p>
-              </div>
-            </div>
-          </.link>
+            </.link>
+          <% end %>
         <% end %>
-      <% end %>
-    </div>
+      </div>
 
-    <div class="w-full max-w-[1000px] mx-auto mt-12">
-      <%= if length(@profiles) == 0 do %>
-        <p class="font-bold m-auto text-xl text-center">No more profiles to show!</p>
-      <% else %>
-        <%!-- <%= profile = Enum.at(@profiles, @current_profile_index) %> --%>
-        <div class="relative max-w-[1000px] h-[80vh] m-2">
-          <div class="relative max-w-[1000px] h-[80vh] border-2 border-yellow-400 rounded-lg flex flex-row overflow-hidden">
-            <div class="h-full w-3/5 relative">
-              <img src={@current_profile.photo_url} alt="Profile picture" class="h-full w-full object-cover" />
-              <button
-            phx-click="next_profile"
-            phx-value-liked_user_id={@current_profile.id}
-            class="p-4 bg-yellow-500 text-white rounded-full absolute bottom-4 transform left-[5%]"
-          >
-            <img src="/images/close_icon.png" class="w-[40px]" />
-          </button>
-          <button
-            phx-click="like"
-            phx-value-liked_user_id={@current_profile.id}
-            class="p-4 bg-yellow-500 text-white rounded-full absolute bottom-4 transform right-[5%]"
-          >
-            <img src="/images/check_icon.png" class="w-[40px]" />
-          </button>
-            </div>
-            <div class="bg-yellow-100 w-2/5 flex flex-col  p-4">
-              <h2 class="font-bold text-2xl"><%= @current_profile.name %></h2>
-              <span class="text-gray-500"><%= @current_profile.gender %></span>
-              <p><%= @current_profile.description %></p>
-              <div>
-                <span class="font-bold">Interests:</span>
-                <ul>
-                  <%= for interest <- @current_profile.interests do %>
-                    <li><%= interest %></li>
-                  <% end %>
-                </ul>
+      <div class="w-full max-w-[1000px] mx-auto mt-12">
+        <%= if length(@profiles) == 0 do %>
+          <p class="font-bold m-auto text-xl text-center">No more profiles to show!</p>
+        <% else %>
+          <%!-- <%= profile = Enum.at(@profiles, @current_profile_index) %> --%>
+          <div class="relative max-w-[1000px] h-[80vh] m-2">
+            <div class="relative max-w-[1000px] h-[80vh] border-2 border-yellow-400 rounded-lg flex flex-row overflow-hidden shadow-lg">
+              <div class="h-full w-3/5 relative">
+                <img
+                  src={@current_profile.photo_url}
+                  alt="Profile picture"
+                  class="h-full w-full object-cover"
+                />
+                <button
+                  phx-click="next_profile"
+                  phx-value-liked_user_id={@current_profile.id}
+                  class="p-4 bg-yellow-500 text-white rounded-full absolute bottom-4 transform left-[5%]"
+                >
+                  <img src="/images/close_icon.png" class="w-[40px]" />
+                </button>
+                <button
+                  phx-click="like"
+                  phx-value-liked_user_id={@current_profile.id}
+                  class="p-4 bg-yellow-500 text-white rounded-full absolute bottom-4 transform right-[5%]"
+                >
+                  <img src="/images/check_icon.png" class="w-[40px]" />
+                </button>
+              </div>
+              <div class="bg-yellow-100 w-2/5 flex flex-col  p-4">
+                <h2 class="font-bold text-2xl"><%= @current_profile.name %></h2>
+                <div>
+                  <span class="text-gray-500"><%= @current_profile.gender %></span>
+                  <span class="text-gray-500 text-sm font-bold"><%= @current_profile.age %></span>
+                </div>
+                <p><%= @current_profile.description %></p>
+                <div>
+                  <span class="font-bold">Interests:</span>
+                  <ul>
+                    <%= for interest <- @current_profile.interests do %>
+                      <li><%= interest %></li>
+                    <% end %>
+                  </ul>
+                </div>
               </div>
             </div>
           </div>
 
-        </div>
+          <%!-- <div class="flex justify-between mt-4">
+            <button
+              phx-click="prev_profile"
+              class="p-2 bg-gray-300 rounded">
+              Previous
+            </button>
 
-        <%!-- <div class="flex justify-between mt-4">
-          <button
-            phx-click="prev_profile"
-            class="p-2 bg-gray-300 rounded">
-            Previous
-          </button>
-
-          <button
-            phx-click="next_profile"
-            class="p-2 bg-gray-300 rounded">
-            Next
-          </button>
-        </div> --%>
-      <% end %>
+            <button
+              phx-click="next_profile"
+              class="p-2 bg-gray-300 rounded">
+              Next
+            </button>
+          </div> --%>
+        <% end %>
+      </div>
     </div>
-  </div>
-  """
-end
-
+    """
+  end
 
   # defp page_title(:show), do: "Show Profile"
   # defp page_title(:edit), do: "Edit Profile"

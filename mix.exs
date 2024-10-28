@@ -11,8 +11,8 @@ defmodule BumbleWebApp.MixProject do
       aliases: aliases(),
       deps: deps()
     ]
-  end 
- 
+  end
+
   # Configuration for the OTP application.
   #
   # Type `mix help compile.app` for more information.
@@ -32,6 +32,7 @@ defmodule BumbleWebApp.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
+      {:uuid, "~> 1.1"},
       {:waffle, "~> 1.1"},
       {:waffle_ecto, "~> 0.0.10"},
       {:bcrypt_elixir, "~> 3.0"},
