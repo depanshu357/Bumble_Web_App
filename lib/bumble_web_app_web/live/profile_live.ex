@@ -91,8 +91,10 @@ defmodule BumbleWebAppWeb.ProfileLive.Show do
 
       mutual_interests_count = count_mutual_interests(current_user.interests, profile.interests)
 
-      {age_difference, -mutual_interests_count}
+
+      {age_difference, -mutual_interests_count, profile.distance}
     end)
+
   end
 
   defp count_mutual_interests(interests1, interests2) do
@@ -155,6 +157,9 @@ defmodule BumbleWebAppWeb.ProfileLive.Show do
           <div class="relative max-w-[1000px] h-[80vh] m-2">
             <div class="relative max-w-[1000px] h-[80vh] border-2 border-yellow-400 rounded-lg flex flex-row overflow-hidden shadow-lg">
               <div class="h-full w-3/5 relative">
+                <h2 class="font-bold text-4xl absolute top-2 left-2 text-white [text-shadow:2px_2px_2px_var(--tw-shadow-color)] shadow-black"><%= @current_profile.name %>
+                  <span class="text-xl"> <%= @current_profile.age %></span>
+                </h2>
                 <img
                   src={@current_profile.photo_url}
                   alt="Profile picture"
@@ -181,6 +186,7 @@ defmodule BumbleWebAppWeb.ProfileLive.Show do
                   <span class="text-gray-500"><%= @current_profile.gender %></span>
                   <span class="text-gray-500 text-sm font-bold"><%= @current_profile.age %></span>
                 </div>
+                <span>Distance: <%= if @current_profile.distance == nil do 0 else Float.floor(@current_profile.distance, 0) |> trunc() end %> km</span>
                 <p><%= @current_profile.description %></p>
                 <div>
                   <span class="font-bold">Interests:</span>

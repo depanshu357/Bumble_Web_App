@@ -33,40 +33,52 @@ defmodule BumbleWebApp.LikesAndMatches do
   end
 
   def list_of_profiles(user_id) do
-    # query = from(u in User,
-    #              where: u.id != ^user_id,
-    #              select: u)
-    # Repo.all(query)
-    # query = from(u in User,
-    #   where: u.id != ^user_id and not exists(
-    #     from(l in Like, where: l.user_id == ^user_id and l.liked_user_id == ^u.id)
-    #   )
-    # )
+    user = Repo.get!(User, user_id)
+
     User
-    |> where([u], u.id != ^user_id)  # Exclude the current user
+    |> where([u], u.id != ^user_id)
     |> join(:left, [u], l in Like, on: l.user_id == ^user_id and l.liked_user_id == u.id)
-    |> where([u, l], is_nil(l.id))  # Only select users that haven't been liked by the current user
+    |> where([_u, l], is_nil(l.id))
+    # |> where([u], is_nil(u.gender) or is_nil(^user.gender) or u.gender != ^user.gender)
+    |> select([u], %{
+        id: u.id,
+        name: u.name,
+        description: u.description,
+        photo_url: u.photo_url,
+        gender: u.gender,
+        interests: u.interests,
+        age: u.age,
+        distance: fragment(
+          "earth_distance(ll_to_earth(?, ?), ll_to_earth(?, ?)) / 1000",
+          u.latitude, u.longitude, ^user.latitude, ^user.longitude
+        )
+      })
     |> Repo.all()
   end
 
+
   def list_matches(user_id) do
+    # Fetch the current user's latitude and longitude
+
+    # Query matches and calculate distance
     from(m in Match,
-    join: u in User,
-    on: u.id == m.user1_id or u.id == m.user2_id,
-    where: m.user1_id == ^user_id or m.user2_id == ^user_id,
-    where: u.id != ^user_id, # To avoid returning the current user's data
-    select: %{
-      user_id: u.id,
-      description: u.description,
-      photo_url: u.photo_url,
-      match_id: m.id,
-      name: u.name,
-      gender: u.gender,
-      interests: u.interests,
-      age: u.age,
-    }
-  )
-  |> Repo.all()
+      join: u in User,
+      on: u.id == m.user1_id or u.id == m.user2_id,
+      where: m.user1_id == ^user_id or m.user2_id == ^user_id,
+      where: u.id != ^user_id, # Avoid returning the current user's data
+      select: %{
+        user_id: u.id,
+        description: u.description,
+        photo_url: u.photo_url,
+        match_id: m.id,
+        name: u.name,
+        gender: u.gender,
+        interests: u.interests,
+        age: u.age,
+      }
+    )
+    |> Repo.all()
   end
+
 
 end

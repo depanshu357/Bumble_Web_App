@@ -179,6 +179,17 @@ defmodule BumbleWebApp.Accounts do
     |> Repo.update()
   end
 
+  def get_nearby_users(user_id, radius_km) do
+    user = Repo.get!(User, user_id)
+    from(u in User,
+      where: fragment(
+        "earth_distance(ll_to_earth(?, ?), ll_to_earth(?, ?)) < ?",
+        u.latitude, u.longitude, ^user.latitude, ^user.longitude, ^radius_km * 1000
+      )
+    )
+    |> Repo.all()
+  end
+
   @doc """
   Emulates that the email will change without actually changing
   it in the database.
