@@ -9,6 +9,24 @@ The Bumble Web App is a real-time, interactive platform that allows users to con
 - **Interest Selection**: Users can choose multiple interests from a list of chips to personalize their profile.
 - **Matching and Chat**: If two users mutually like each other, they can start a real-time conversation.
 - **Real-Time Updates**: Phoenix LiveView keeps user interactions responsive and up-to-date without page reloads.
+- **Location-based Distance Calculation**: Each profile shows the distance from your location.
+
+## App Showcase
+
+#### Profile Update
+<img src="/images_for_readme/profile_updation_page.png" alt="profile upload" width="60%"/>
+Easily update your profile details, including name, description, and profile photo. Users can also select specific interests to match with others who share similar preferences.
+
+#### Profile Selection
+<!-- ![Profile Selection](/images_for_readme/profile_selection_page.png) -->
+<img src="/images_for_readme/profile_selection_page.png" alt="profile selection" width="60%" />
+Swipe through other user profiles one at a time, and choose to like or reject them based on your interest. The app shows the distance between you and other users, giving you location-based suggestions.
+
+
+#### Real-Time Chat
+<!-- ![Real-Time Chat](/images_for_readme/real_time_chat.png) -->
+<img src="/images_for_readme/real_time_chat.png" alt="real time chat" width="60%" />
+Once you’ve matched with another user, engage in a seamless, real-time chat. Messages are updated instantly, making conversations feel dynamic and responsive.
 
 ---
 
