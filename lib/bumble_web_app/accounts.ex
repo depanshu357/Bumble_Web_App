@@ -116,6 +116,34 @@ defmodule BumbleWebApp.Accounts do
     User.email_changeset(user, attrs, validate_email: false)
   end
 
+  def change_user_age(user, attrs \\ %{}) do
+    User.age_changeset(user, attrs)
+  end
+
+  def update_user_age(user, attrs) do
+    user
+    |> User.age_changeset(attrs)
+    |> Repo.update()
+  end
+
+  def change_user_interests(user, attrs \\ %{}) do
+    User.interests_changeset(user, attrs)
+  end
+  def update_user_interests(user, attrs) do
+    user
+    |> User.interests_changeset(attrs)
+    |> Repo.update()
+  end
+
+  def change_user_gender(user, attrs \\ %{}) do
+    User.gender_changeset(user, attrs)
+  end
+  def update_user_gender(user, attrs) do
+    user
+    |> User.gender_changeset(attrs)
+    |> Repo.update()
+  end
+
   def change_user_name(user, attrs \\ %{}) do
     User.name_changeset(user, attrs)
   end
@@ -142,6 +170,24 @@ defmodule BumbleWebApp.Accounts do
 
   def change_user_photo(user) do
     User.image_changeset(user, %{})
+  end
+
+  def update_user_location(user_id, location_data) do
+    User
+    |> Repo.get!(user_id)
+    |> User.location_changeset(location_data)
+    |> Repo.update()
+  end
+
+  def get_nearby_users(user_id, radius_km) do
+    user = Repo.get!(User, user_id)
+    from(u in User,
+      where: fragment(
+        "earth_distance(ll_to_earth(?, ?), ll_to_earth(?, ?)) < ?",
+        u.latitude, u.longitude, ^user.latitude, ^user.longitude, ^radius_km * 1000
+      )
+    )
+    |> Repo.all()
   end
 
   @doc """

@@ -43,5 +43,50 @@
 }
 
 .update-profile-buttons  button{
-    background-color: #f4d215 !important;
+    background-color: rgb(234, 179, 8) !important;
+}
+
+.chat_page_chat_box{
+    height: calc(100vh - 58px);
+}
+
+#gender_form > div{
+    display: flex;
+    flex-direction: row;
+    height: 3rem;
+    align-items: center;
+    justify-content: space-between;
+}
+
+#name_form > div{
+    display: flex;
+    flex-direction: row;
+    height: 3rem;
+    align-items: center;
+    justify-content: space-between;
+}
+
+#age_form > div{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+#description_form{
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    justify-content: space-between;
+}
+
+button{
+    margin: 0px !important;
+}
+
+.interests-list{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 2px;
 }

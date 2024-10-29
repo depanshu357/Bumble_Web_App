@@ -3,12 +3,15 @@ defmodule BumbleWebAppWeb.UpdateProfileLive.Show do
 
   alias BumbleWebApp.Accounts
 
+
+  @impl true
   def render(assigns) do
     ~H"""
     <.header class="text-center">
-      Account Settings
-      <:subtitle>Manage your account email address and password settings</:subtitle>
+      Update your charisma!
+      <%!-- <:subtitle>Manage your account email address and password settings</:subtitle> --%>
     </.header>
+    <div id="location" phx-hook="LocationRequest"></div>
 
     <div class="update-profile-buttons max-w-[1000px] w-screen mx-auto p-4 flex flex-row gap-4 justify-between flex-wrap md:flex-nowrap">
       <div class="w-full md:w-1/2">
@@ -18,7 +21,7 @@ defmodule BumbleWebAppWeb.UpdateProfileLive.Show do
             <img
               src={@current_user.photo_url}
               alt="Profile Photo"
-              class="h-[400px] w-full rounded-md object-cover"
+              class="h-[400px] w-full rounded-md object-cover shadow-lg"
             />
           <% else %>
             <div class="h-4 w-full">No profile photo uploaded</div>
@@ -54,10 +57,27 @@ defmodule BumbleWebAppWeb.UpdateProfileLive.Show do
         </div>
       </div>
       <div class="w-full md:w-1/2">
-      <.simple_form for={@name_form} id="name_form" phx-submit="update_name">
-          <.input field={@name_form[:name]} type="text" label="Name" required/>
+        <.simple_form for={@name_form} id="name_form" phx-submit="update_name">
+          <.input field={@name_form[:name]} type="text" label="Name" required />
           <:actions>
             <.button phx-disable-with="Changing...">Update Name</.button>
+          </:actions>
+        </.simple_form>
+        <.simple_form for={@gender_form} id="gender_form" phx-submit="update_gender">
+          <.input
+            field={@gender_form[:gender]}
+            type="select"
+            class="mt-0"
+            options={[{"Male", "Male"}, {"Female", "Female"}]}
+          />
+          <%!-- <:actions class="mt-0"> --%>
+          <.button phx-disable-with="Changing...">Select Gender</.button>
+          <%!-- </:actions> --%>
+        </.simple_form>
+        <.simple_form for={@age_form} id="age_form" phx-submit="update_age">
+          <.input field={@age_form[:age]} type="number" label="Age" required />
+          <:actions>
+            <.button phx-disable-with="Changing...">Select Age</.button>
           </:actions>
         </.simple_form>
         <.simple_form for={@description_form} id="description_form" phx-submit="update_description">
@@ -68,9 +88,30 @@ defmodule BumbleWebAppWeb.UpdateProfileLive.Show do
         </.simple_form>
       </div>
     </div>
+    <div class="max-w-[1000px] w-screen mt-2 mx-auto p-4">
+      <h2 class="text-center font-bold">Select your interests</h2>
+      <p class="text-center text-sm text-gray-500 mb-2">It will help in finding better people</p>
+      <form phx-submit="update_interests" class="interests-list flex flex-row justify-between flex-wrap w-full gap-2" phx-submit="update_interests">
+        <%= for interest <- @predefined_interests do %>
+          <span
+            phx-click="toggle_interest"
+            phx-value-interest={interest}
+            class={"hover:bg-gray-300 p-2 rounded-md border border-gray-300 cursor-pointer" <> if interest in @interests, do: " bg-yellow-500 text-white hover:bg-yellow-500", else: ""}
+          >
+            <%= interest %>
+          </span>
+        <% end %>
+        <div class="w-full flex flex-row-reverse">
+        <button type="submit"  phx-disable-with="Updating..." class="m-2 p-2 rounded-md text-white font-bold bg-yellow-500">
+          Update Interests
+        </button>
+        </div>
+      </form>
+    </div>
     """
   end
 
+  @impl true
   def mount(%{"token" => token}, _session, socket) do
     socket =
       case Accounts.update_user_email(socket.assigns.current_user, token) do
@@ -91,7 +132,12 @@ defmodule BumbleWebAppWeb.UpdateProfileLive.Show do
     description_changeset = Accounts.change_user_description(user)
     name_changeset = Accounts.change_user_name(user)
     photo_form = Accounts.change_user_photo(user)
+    gender_form = Accounts.change_user_gender(user)
+    age_form = Accounts.change_user_age(user)
+    interests = user.interests || []
+    predefined_interests = ["📖 Reading", "🧳 Travelling", "⚽ Sports", "🎶 Music", "🍿 Movies", "🥘 Cooking", "🎨 Art", "📷 Photography", "🕹️ Gaming", "🌍 Environmental Activism", "🏕️ Camping", "🖥️ Tech & Coding", "✈️ Adventure", "🍽️ Food Tasting", "🚴 Biking", "🏋️ Fitness", "🌌 Stargazing", "✍️ Writing", "🎭 Theater", "🧘 Mindfulness", "🎤 Karaoke", "🐾 Animal Welfare", "📚 Self-Improvement", "🎲 Board Games","🌱 Gardening","🛶 Kayaking", "🚗 Road Trips", "🌄 Hiking", "🏄 Water Sports", "🏌️ Golf", "🧩 Puzzles", "🎳 Bowling", "🧵 Crafts & DIY", "🏛️ History", "🛍️ Fashion", "🏖️ Beach Days", "📜 Cultural Events", "🎉 Party Planning", "🎣 Fishing", "🚤 Boating", "🥂 Wine Tasting", "🎧 Podcasts", "🧗 Rock Climbing", "🛹 Skateboarding", "🖋️ Calligraphy", "🧙 Fantasy & Sci-Fi", "🎥 Filmmaking", "🎩 Magic Tricks", "🔬 Science Experiments"]
 
+    IO.inspect(interests)
     socket =
       socket
       |> assign(:current_password, nil)
@@ -102,10 +148,18 @@ defmodule BumbleWebAppWeb.UpdateProfileLive.Show do
       |> assign(:description_form, to_form(description_changeset))
       |> assign(:name_form, to_form(name_changeset))
       |> assign(:photo_form, to_form(photo_form))
+      |> assign(:gender_form, to_form(gender_form))
+      |> assign(:age_form, to_form(age_form))
+      |> assign(:interests, interests)
+      |> assign(:predefined_interests, predefined_interests)
       |> allow_upload(:photo, accept: ~w(.jpg .jpeg .png), max_entries: 1)
       |> assign(:trigger_submit, false)
-
     {:ok, socket}
+  end
+
+  def handle_event("location_update", %{"latitude" => lat, "longitude" => lng}, socket) do
+    Accounts.update_user_location(socket.assigns.current_user.id, %{latitude: lat, longitude: lng})
+    {:noreply, socket}
   end
 
   def handle_event("change_photo", _params, socket) do
@@ -121,13 +175,14 @@ defmodule BumbleWebAppWeb.UpdateProfileLive.Show do
     uploaded_files =
       consume_uploaded_entries(socket, :photo, fn %{path: path}, _entry ->
         extension = ".png"
-        # Ensure the destination path includes the appropriate extension
-        dest = Path.join("priv/static/uploads/photos", Path.basename(path) <> extension)
+        unique_id = UUID.uuid4()
+        path_name_inside_folder = unique_id <> "_" <> Path.basename(path) <> extension
+        dest = Path.join("priv/static/uploads/photos", path_name_inside_folder)
 
         # Copy the file and return the path
         File.cp!(path, dest)
         # Return the relative path to be stored in photo_url
-        "/uploads/photos/#{Path.basename(path) <> extension}"
+        "/uploads/photos/#{path_name_inside_folder}"
       end)
 
     # Get the image URL if the upload was successful
@@ -159,23 +214,23 @@ defmodule BumbleWebAppWeb.UpdateProfileLive.Show do
   def handle_event("update_description", %{"user" => user_params}, socket) do
     case Accounts.update_user_description(socket.assigns.current_user, user_params) do
       {:ok, _user} ->
-        # Successful update, re-render the form with a new empty changeset
+
         description_form =
           Accounts.change_user_description(socket.assigns.current_user) |> to_form()
 
         {:noreply,
          socket
-         # Success message
+
          |> put_flash(:info, "Description updated successfully.")
          |> assign(description_form: description_form)}
 
       {:error, %Ecto.Changeset{} = changeset} ->
-        # On error, re-render the form with the errors in the changeset
+
         description_form = to_form(changeset)
 
         {:noreply,
          socket
-         # Error message
+
          |> put_flash(:error, "Something went wrong. Please check the errors below.")
          |> assign(description_form: description_form)}
     end
@@ -184,27 +239,111 @@ defmodule BumbleWebAppWeb.UpdateProfileLive.Show do
   def handle_event("update_name", %{"user" => user_params}, socket) do
     case Accounts.update_user_name(socket.assigns.current_user, user_params) do
       {:ok, _user} ->
-        # Successful update, re-render the form with a new empty changeset
+
         name_form =
           Accounts.change_user_name(socket.assigns.current_user) |> to_form()
 
         {:noreply,
          socket
-         # Success message
+
          |> put_flash(:info, "Name updated successfully.")
          |> assign(name_form: name_form)}
 
       {:error, %Ecto.Changeset{} = changeset} ->
-        # On error, re-render the form with the errors in the changeset
+
         name_form = to_form(changeset)
 
         {:noreply,
          socket
-         # Error message
+
          |> put_flash(:error, "Something went wrong. Please check the errors below.")
          |> assign(name_form: name_form)}
     end
   end
 
+  def handle_event("update_gender", %{"user" => user_params}, socket) do
+    case Accounts.update_user_gender(socket.assigns.current_user, user_params) do
+      {:ok, _user} ->
+
+        gender_form =
+          Accounts.change_user_gender(socket.assigns.current_user) |> to_form()
+
+        {:noreply,
+         socket
+
+         |> put_flash(:info, "Gender updated successfully.")
+         |> assign(gender_form: gender_form)}
+
+      {:error, %Ecto.Changeset{} = changeset} ->
+
+        gender_form = to_form(changeset)
+
+        {:noreply,
+         socket
+
+         |> put_flash(:error, "Something went wrong. Please check the errors below.")
+         |> assign(gender_form: gender_form)}
+    end
+  end
+
+  def handle_event("validate_gender", %{"gender" => gender}, socket) do
+    # Assign the selected gender to the socket's assigns
+    gender_form = Map.put(socket.assigns.gender_form, :gender, gender)
+    {:noreply, assign(socket, gender_form: gender_form)}
+  end
+
+  def handle_event("update_age", %{"user" => user_params}, socket) do
+    case Accounts.update_user_age(socket.assigns.current_user, user_params) do
+      {:ok, _user} ->
+
+        age_form =
+          Accounts.change_user_age(socket.assigns.current_user) |> to_form()
+
+        {:noreply,
+         socket
+
+         |> put_flash(:info, "Age updated successfully.")
+         |> assign(age_form: age_form)}
+
+      {:error, %Ecto.Changeset{} = changeset} ->
+
+        age_form = to_form(changeset)
+
+        {:noreply,
+         socket
+
+         |> put_flash(:error, "Something went wrong. Please check the errors below.")
+         |> assign(age_form: age_form)}
+    end
+  end
+
+  @impl true
+  def handle_event("toggle_interest", %{"interest" => interest}, socket) do
+    interests = socket.assigns.interests
+
+    # Toggle the interest in the list
+    updated_interests =
+      if interest in interests do
+        interests -- [interest]  # Remove if already selected
+      else
+        [interest | interests]   # Add if not yet selected
+      end
+
+    {:noreply, assign(socket, :interests, updated_interests)}
+  end
+
+  def handle_event("update_interests", _params, socket) do
+    current_user = socket.assigns.current_user
+    interests = socket.assigns.interests
+
+    # Update the user interests
+    case Accounts.update_user_interests(current_user, %{"interests" => interests}) do
+      {:ok, _user} ->
+        {:noreply, put_flash(socket, :info, "Interests updated successfully.")}
+
+      {:error, %Ecto.Changeset{} = _changeset} ->
+        {:noreply, put_flash(socket, :error, "Failed to update interests.")}
+    end
+  end
 
 end
