@@ -44,15 +44,6 @@ Please use a linux(ubuntu specifically) envivronment if possible
    ```bash
    mix ecto.setup
    ```
-   to enable location features and their calculations we need to modify the backend service , if you want to use without modifying backend , please use the 22nd commit b3fddbb1b83aa96bdb3f7fc17f7dd241a624fea5, otherwise type the commands in the command line 
-   ```bash
-   psql -U postgres -d bumble_web_app_dev
-   ```
-   ```bash
-   CREATE EXTENSION IF NOT EXISTS cube;
-   CREATE EXTENSION IF NOT EXISTS earthdistance;
-   ```
-
 
 4. **Run the web app**
 
