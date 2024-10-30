@@ -32,7 +32,7 @@ defmodule BumbleWebApp.LikesAndMatches do
     end
   end
 
-  def list_of_profiles(user_id) do
+  def list_of_profiles(user_id, distance \\ 10) do
     user = Repo.get!(User, user_id)
 
     User
@@ -40,6 +40,10 @@ defmodule BumbleWebApp.LikesAndMatches do
     |> join(:left, [u], l in Like, on: l.user_id == ^user_id and l.liked_user_id == u.id)
     |> where([_u, l], is_nil(l.id))
     # |> where([u], is_nil(u.gender) or is_nil(^user.gender) or u.gender != ^user.gender)
+    |> where([u], fragment(
+      "earth_distance(ll_to_earth(?, ?), ll_to_earth(?, ?)) <= ? * 1000",
+      u.latitude, u.longitude, ^user.latitude, ^user.longitude, ^distance
+    ))
     |> select([u], %{
         id: u.id,
         name: u.name,

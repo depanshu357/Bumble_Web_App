@@ -8,7 +8,7 @@ defmodule BumbleWebAppWeb.ProfileLive.Show do
   def mount(_params, _session, socket) do
     user = socket.assigns.current_user
     # profiles = LikesAndMatches.list_of_profiles(user.id)
-    profiles = sort_profiles(LikesAndMatches.list_of_profiles(user.id), user)
+    profiles = sort_profiles(LikesAndMatches.list_of_profiles(user.id, 10), user)
     matches = LikesAndMatches.list_matches(user.id)
     current_profile = Enum.at(profiles, 0)
     dbg(matches)
@@ -19,7 +19,8 @@ defmodule BumbleWebAppWeb.ProfileLive.Show do
        user: user,
        matches: matches,
        current_profile: current_profile,
-       current_profile_index: 0
+       current_profile_index: 0,
+       selected_distance: 10
      )}
   end
 
@@ -91,10 +92,8 @@ defmodule BumbleWebAppWeb.ProfileLive.Show do
 
       mutual_interests_count = count_mutual_interests(current_user.interests, profile.interests)
 
-
       {age_difference, -mutual_interests_count, profile.distance}
     end)
-
   end
 
   defp count_mutual_interests(interests1, interests2) do
@@ -102,7 +101,9 @@ defmodule BumbleWebAppWeb.ProfileLive.Show do
   end
 
   def handle_event("next_profile", _params, socket) do
-    new_index = min(socket.assigns.current_profile_index + 1, length(socket.assigns.profiles) - 1)
+    new_index =
+      min(socket.assigns.current_profile_index + 1, length(socket.assigns.profiles) - 1)
+
     current_profile = Enum.at(socket.assigns.profiles, new_index)
     {:noreply, assign(socket, current_profile_index: new_index, current_profile: current_profile)}
   end
@@ -118,6 +119,26 @@ defmodule BumbleWebAppWeb.ProfileLive.Show do
   def handle_info({:match, liked_user_id}, socket) do
     put_flash(socket, :info, "You've matched with user #{liked_user_id}!")
     {:noreply, socket}
+  end
+
+  @impl true
+  def handle_event("update_distance", %{"distance" => distance}, socket) do
+    dbg(distance)
+    selected_distance = String.to_integer(distance)
+    # socket = assign(socket, selected_distance: distance)
+    profiles = LikesAndMatches.list_of_profiles(socket.assigns.user.id, selected_distance)
+    display_distance = if selected_distance == 100 do
+      "100+"
+    else
+      selected_distance
+    end
+    {:noreply,
+      socket
+      |> assign(selected_distance: display_distance)
+      |> assign(current_profile: Enum.at(profiles, 0))
+      |> assign(current_profile_index: 0)
+      |> put_flash(:info, "Distance updated to #{display_distance} km.")
+    }
   end
 
   @impl true
@@ -154,11 +175,30 @@ defmodule BumbleWebAppWeb.ProfileLive.Show do
           <p class="font-bold m-auto text-xl text-center">No more profiles to show!</p>
         <% else %>
           <%!-- <%= profile = Enum.at(@profiles, @current_profile_index) %> --%>
+          <div class="m-2 flex flex-row gap-2 items-center">
+            <label for="distance_slider">
+              Distance: <span class="text-yellow-500"><%= @selected_distance %> km</span>
+            </label>
+            <form phx-change="update_distance">
+              <input
+                type="range"
+                min="0"
+                max="100"
+                step="1"
+                name="distance"
+                value={@selected_distance}
+                phx-debounce="300"
+                id="distance_slider"
+                class="w-full h-2 bg-yellow-400 rounded-md appearance-none cursor-pointer accent-yellow-600"
+              />
+            </form>
+          </div>
           <div class="relative max-w-[1000px] h-[80vh] m-2">
             <div class="relative max-w-[1000px] h-[80vh] border-2 border-yellow-400 rounded-lg flex flex-row overflow-hidden shadow-lg">
               <div class="h-full w-3/5 relative">
-                <h2 class="font-bold text-4xl absolute top-2 left-2 text-white [text-shadow:2px_2px_2px_var(--tw-shadow-color)] shadow-black"><%= @current_profile.name %>
-                  <span class="text-xl"> <%= @current_profile.age %></span>
+                <h2 class="font-bold text-4xl absolute top-2 left-2 text-white [text-shadow:2px_2px_2px_var(--tw-shadow-color)] shadow-black">
+                  <%= @current_profile.name %>
+                  <span class="text-xl"><%= @current_profile.age %></span>
                 </h2>
                 <img
                   src={@current_profile.photo_url}
@@ -186,7 +226,13 @@ defmodule BumbleWebAppWeb.ProfileLive.Show do
                   <span class="text-gray-500"><%= @current_profile.gender %></span>
                   <span class="text-gray-500 text-sm font-bold"><%= @current_profile.age %></span>
                 </div>
-                <span>Distance: <%= if @current_profile.distance == nil do 0 else Float.floor(@current_profile.distance, 0) |> trunc() end %> km</span>
+                <span>
+                  Distance: <%= if @current_profile.distance == nil do
+                    0
+                  else
+                    Float.floor(@current_profile.distance, 0) |> trunc()
+                  end %> km
+                </span>
                 <p><%= @current_profile.description %></p>
                 <div>
                   <span class="font-bold">Interests:</span>
