@@ -92,7 +92,7 @@ defmodule BumbleWebAppWeb.ProfileLive.Show do
 
       mutual_interests_count = count_mutual_interests(current_user.interests, profile.interests)
 
-      {age_difference, -mutual_interests_count, profile.distance}
+      {-mutual_interests_count, age_difference, profile.distance}
     end)
   end
 
@@ -119,6 +119,14 @@ defmodule BumbleWebAppWeb.ProfileLive.Show do
   def handle_info({:match, liked_user_id}, socket) do
     put_flash(socket, :info, "You've matched with user #{liked_user_id}!")
     {:noreply, socket}
+  end
+
+  def match_percentage(given_interests, user_interests) do
+    # user_interests = ["hiking", "reading", "cooking", "swimming", "coding"]
+    user_interests_count = length(user_interests)
+    common_interests_count = count_mutual_interests(given_interests, user_interests)
+
+    Float.round((common_interests_count / user_interests_count) * 100, 2)
   end
 
   @impl true
@@ -235,6 +243,9 @@ defmodule BumbleWebAppWeb.ProfileLive.Show do
                 </span>
                 <p><%= @current_profile.description %></p>
                 <div>
+                  <div>
+                    <span > Match Percentage: </span> <span class="font-bold"> <%= match_percentage(@current_profile.interests,@current_user.interests) %>% </span>
+                  </div>
                   <span class="font-bold">Interests:</span>
                   <ul>
                     <%= for interest <- @current_profile.interests do %>
